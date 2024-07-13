@@ -5,7 +5,6 @@ import com.example.ecommerce.customer.model.Customer
 import com.example.ecommerce.customer.repository.CustomerRepository
 import com.example.ecommerce.product.exception.InvalidParameterException
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -14,7 +13,6 @@ import java.time.LocalDateTime
 class CustomerServiceImpl : CustomerService {
 
     @Autowired
-    @Qualifier("customerRepository")
     private val customerRepository: CustomerRepository ? = null
 
     override fun registerCustomer(customerDto: CustomerDto): Customer {

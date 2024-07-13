@@ -1,6 +1,7 @@
 package com.example.ecommerce.product.controller
 
 import com.example.ecommerce.product.dto.ProductDto
+import com.example.ecommerce.product.model.Category
 import com.example.ecommerce.product.model.Product
 import com.example.ecommerce.product.service.ProductService
 import org.springframework.beans.factory.annotation.Autowired
@@ -44,6 +45,13 @@ class ProductController {
     fun getProductById(@PathVariable id: Long): ResponseEntity<Product> {
         val product = productService.getProductById(id)
         return ResponseEntity(product, HttpStatus.OK)
+    }
+
+    // Endpoint to get a product by id
+    @GetMapping("/categories")
+    fun getProductById(): ResponseEntity<List<Category>> {
+        val categories = productService.getCategories()
+        return ResponseEntity(categories, HttpStatus.OK)
     }
 
     // Endpoint to get a product by name (example of a custom query)

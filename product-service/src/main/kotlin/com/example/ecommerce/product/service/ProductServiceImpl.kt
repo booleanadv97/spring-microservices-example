@@ -2,7 +2,9 @@ package com.example.ecommerce.product.service
 
 import com.example.ecommerce.product.dto.ProductDto
 import com.example.ecommerce.product.exception.InvalidParameterException
+import com.example.ecommerce.product.model.Category
 import com.example.ecommerce.product.model.Product
+import com.example.ecommerce.product.repository.CategoryRepository
 import com.example.ecommerce.product.repository.ProductRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -17,7 +19,9 @@ class ProductServiceImpl : ProductService {
     }
 
     @Autowired
-    @Qualifier("productRepository")
+    private lateinit var categoryRepository: CategoryRepository
+
+    @Autowired
     private lateinit var productRepository: ProductRepository
 
     override fun createProduct(productDto: ProductDto): Product {
@@ -55,6 +59,10 @@ class ProductServiceImpl : ProductService {
         return productRepository.findById(id)
             .orElseThrow { InvalidParameterException("Product $id not found")
             }
+    }
+
+    override fun getCategories(): List<Category> {
+        return categoryRepository.findAllBy()
     }
 
     override fun getProductByName(name: String): Product? {
