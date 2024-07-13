@@ -2,14 +2,11 @@ package com.example.ecommerce.product.service
 
 import com.example.ecommerce.product.dto.ProductDto
 import com.example.ecommerce.product.exception.InvalidParameterException
-import com.example.ecommerce.product.exception.MissingParameterException
 import com.example.ecommerce.product.model.Product
 import com.example.ecommerce.product.repository.ProductRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 
 @Service

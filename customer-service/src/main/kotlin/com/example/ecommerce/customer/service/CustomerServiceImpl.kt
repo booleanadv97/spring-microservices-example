@@ -1,7 +1,6 @@
 package com.example.ecommerce.customer.service
 
 import com.example.ecommerce.customer.dto.CustomerDto
-import com.example.ecommerce.customer.model.Address
 import com.example.ecommerce.customer.model.Customer
 import com.example.ecommerce.customer.repository.CustomerRepository
 import com.example.ecommerce.product.exception.InvalidParameterException
