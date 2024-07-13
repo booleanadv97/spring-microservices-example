@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("/api/products")
@@ -18,12 +19,7 @@ class ProductController {
     // Endpoint to create a new product
     @PostMapping("/register")
     fun createProduct(@RequestBody productDto: ProductDto): ResponseEntity<Product> {
-        val newProduct = productService.createProduct(
-            productDto.name,
-            productDto.description,
-            productDto.price,
-            productDto.quantity
-        )
+        val newProduct = productService.createProduct(productDto)
         return ResponseEntity(newProduct, HttpStatus.CREATED)
     }
 
@@ -33,13 +29,7 @@ class ProductController {
         @PathVariable id: Long,
         @RequestBody productDto: ProductDto
     ): ResponseEntity<Product> {
-        val updatedProduct = productService.updateProduct(
-            id,
-            productDto.name,
-            productDto.description,
-            productDto.price,
-            productDto.quantity
-        )
+        val updatedProduct = productService.updateProduct(id, productDto)
         return ResponseEntity(updatedProduct, HttpStatus.OK)
     }
 

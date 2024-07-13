@@ -1,6 +1,7 @@
 package com.example.ecommerce.customer.controller
 
 import com.example.ecommerce.customer.dto.CustomerDto
+import com.example.ecommerce.customer.model.Address
 import com.example.ecommerce.customer.model.Customer
 import com.example.ecommerce.customer.service.CustomerService
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,9 +17,9 @@ class CustomerController {
     private lateinit var customerService: CustomerService
 
     @PostMapping("/register")
-    fun registerUser(@RequestBody request: CustomerDto): ResponseEntity<Customer> {
-        val user = customerService.registerCustomer(request.username, request.email, request.password)
-        return ResponseEntity(user, HttpStatus.CREATED)
+    fun registerUser(@RequestBody customerDto: CustomerDto): ResponseEntity<Customer> {
+        val customer = customerService.registerCustomer(customerDto)
+        return ResponseEntity(customer, HttpStatus.CREATED)
     }
 
     @GetMapping("/{userId}")
@@ -32,13 +33,13 @@ class CustomerController {
         @PathVariable userId: Long,
         @RequestBody request: CustomerDto
     ): ResponseEntity<Customer> {
-        val user = customerService.updateCustomer(userId, request.username, request.email)
+        val user = customerService.updateCustomer(request)
         return ResponseEntity(user, HttpStatus.OK)
     }
 
     @DeleteMapping("/{userId}")
     fun deleteUser(@PathVariable userId: Long): ResponseEntity<Void> {
         customerService.deleteCustomer(userId)
-        return ResponseEntity(HttpStatus.NO_CONTENT)
+        return ResponseEntity(HttpStatus.OK)
     }
 }

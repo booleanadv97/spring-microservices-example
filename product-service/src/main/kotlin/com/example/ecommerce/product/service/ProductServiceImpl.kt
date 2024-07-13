@@ -1,54 +1,66 @@
 package com.example.ecommerce.product.service
 
+import com.example.ecommerce.product.dto.ProductDto
+import com.example.ecommerce.product.exception.InvalidParameterException
+import com.example.ecommerce.product.exception.MissingParameterException
 import com.example.ecommerce.product.model.Product
 import com.example.ecommerce.product.repository.ProductRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDateTime
 
 @Service
 class ProductServiceImpl : ProductService {
+
+    override fun getAllProducts(): List<Product> {
+        return productRepository.findAll()
+    }
 
     @Autowired
     @Qualifier("productRepository")
     private lateinit var productRepository: ProductRepository
 
-    override fun createProduct(name: String, description: String, price: Double, quantity: Int): Product {
+    override fun createProduct(productDto: ProductDto): Product {
         val newProduct = Product(
-            name = name,
-            description = description,
-            price = price,
-            quantity = quantity
+            name = productDto.name,
+            description = productDto.description,
+            price = productDto.price,
+            availability = productDto.availability,
+            category = productDto.category
         )
         return productRepository.save(newProduct)
     }
 
-    override fun updateProduct(id: Long, name: String, description: String, price: Double, quantity: Int): Product {
+    override fun updateProduct(id: Long, productDto: ProductDto): Product {
         val product = productRepository.findById(id)
-            .orElseThrow { NoSuchElementException("Product with id $id not found") }
-
-        product.name = name
-        product.description = description
-        product.price = price
-        product.quantity = quantity
-
+            .orElseThrow { InvalidParameterException("Product $id not found")
+            }
+        product.name = productDto.name
+        product.description = productDto.description
+        product.price = productDto.price
+        product.availability = productDto.availability
+        product.category = productDto.category
+        product.updatedAt = LocalDateTime.now()
         return productRepository.save(product)
     }
 
     override fun deleteProduct(id: Long) {
-        if (productRepository.existsById(id)) {
-            productRepository.deleteById(id)
-        } else {
-            throw NoSuchElementException("Product with id $id not found")
-        }
+        val product = productRepository.findById(id)
+            .orElseThrow { InvalidParameterException("Product $id not found")
+            }
+        productRepository.delete(product)
     }
 
     override fun getProductById(id: Long): Product {
         return productRepository.findById(id)
-            .orElseThrow { NoSuchElementException("Product with id $id not found") }
+            .orElseThrow { InvalidParameterException("Product $id not found")
+            }
     }
 
     override fun getProductByName(name: String): Product? {
-        return productRepository.findByName(name)
+        return productRepository.findByName(name)?: throw InvalidParameterException("Product $name not found")
     }
 }

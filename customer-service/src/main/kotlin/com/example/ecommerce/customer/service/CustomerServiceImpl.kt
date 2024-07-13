@@ -1,10 +1,14 @@
 package com.example.ecommerce.customer.service
 
+import com.example.ecommerce.customer.dto.CustomerDto
+import com.example.ecommerce.customer.model.Address
 import com.example.ecommerce.customer.model.Customer
 import com.example.ecommerce.customer.repository.CustomerRepository
+import com.example.ecommerce.product.exception.InvalidParameterException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 
 @Service
@@ -14,66 +18,54 @@ class CustomerServiceImpl : CustomerService {
     @Qualifier("customerRepository")
     private val customerRepository: CustomerRepository ? = null
 
-    override fun registerCustomer(username: String?, email: String?, password: String?): Customer {
-        // Check for null arguments
-        if (username.isNullOrBlank() || email.isNullOrBlank() || password.isNullOrBlank()) {
-            throw IllegalArgumentException("Username, email, and password must not be null or empty")
-        }
-        // Check if the customer already exists with the same email
-        if (customerRepository!!.findByEmail(email) != null) {
-            throw IllegalArgumentException("User with this email already exists")
+    override fun registerCustomer(customerDto: CustomerDto): Customer {
+        if (customerRepository!!.findByEmail(customerDto.email) != null) {
+            throw InvalidParameterException("Customer with email ${customerDto.email} already exists.")
         }
         // Create a new Customer object
         val newCustomer = Customer(
-            username = username,
-            email = email,
-            password = password //TODO Remember to hash passwords
+            givenName = customerDto.givenName,
+            familyName = customerDto.familyName,
+            email = customerDto.email,
+            password = customerDto.password, //TODO Remember to hash passwords
+            address = customerDto.address
         )
         // Save the new customer to the database
         val savedCustomer = customerRepository.save(newCustomer)
         return savedCustomer
     }
 
-    override fun updateCustomer(id: Long?, username: String?, email: String?): Customer {
-        id ?: throw IllegalArgumentException("User id must not be null")
-        // Fetch customer from repository
-        val customer = customerRepository!!.findById(id)
-            .orElseThrow { throw NoSuchElementException("User with id $id not found") }
+    override fun updateCustomer(customerDto: CustomerDto): Customer? {
+        // Check for customer existence
+        val customer = customerRepository!!.findById(customerDto.id)
+            .orElseThrow { InvalidParameterException("Customer with id ${customerDto.id} not found") }
+        // Update customer data
+        customer.email = customerDto.email
+        customer.password = customerDto.password
+        customer.address = customerDto.address
+        customer.updatedAt = LocalDateTime.now()
 
-        // Update customer fields if not null
-        username?.let { customer.username = it }
-        email?.let { customer.email = it }
-
-        // Save updated customer
-        val updatedCustomer = customerRepository.save(customer)
-        return updatedCustomer
+        // Return updated customer
+        return customerRepository.save(customer)
     }
 
-    override fun deleteCustomer(id: Long?) {
-        // Check for null argument
-        id ?: throw IllegalArgumentException("User id must not be null")
+    override fun deleteCustomer(id: Long) {
         // Find customer registered account otherwise launch exception
         val customer = customerRepository!!.findById(id)
-            .orElseThrow { throw NoSuchElementException("Customer with id $id not found") }
+            .orElseThrow { InvalidParameterException("Customer with id $id not found") }
         // Delete customer from repository
         customerRepository.delete(customer)
     }
 
-    override fun getCustomerById(id: Long?): Customer? {
-        // Check for null argument
-        id ?: throw IllegalArgumentException("Customer id must not be null")
+    override fun getCustomerById(id: Long): Customer? {
         // Search for the customer with the given id, throw exception if not found
-        val customer = customerRepository!!.findById(id)
-            .orElseThrow { throw NoSuchElementException("Customer with id $id not found") }
-        return customer
+        return customerRepository!!.findById(id)
+            .orElseThrow { InvalidParameterException("Customer with id $id not found")  }
     }
 
     override fun getCustomerByEmail(email: String?): Customer? {
         // Check for null argument
         email ?: throw IllegalArgumentException("Email must not be null")
-        // Search for customer with the given e-mail, if not found throw exception
-        val customer = customerRepository!!.findByEmail(email)
-        customer ?: throw NoSuchElementException("Customer with email $email not found")
-        return customer
+        return customerRepository!!.findByEmail(email) ?: throw InvalidParameterException("Customer with email $email not found")
     }
 }

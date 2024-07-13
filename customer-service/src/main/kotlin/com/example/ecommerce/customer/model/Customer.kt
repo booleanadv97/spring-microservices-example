@@ -1,18 +1,41 @@
 package com.example.ecommerce.customer.model
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
-class Customer(
-    var username: String? = null,
-    var email: String? = null,
-    var password: String? = null,
-    var updatedAt: LocalDateTime? = null,
-    val createdAt: LocalDateTime? = LocalDateTime.now(),
+data class Customer(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = null)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0,
 
+    @Column(nullable = false)
+    val givenName: String,
+
+    @Column(nullable = false)
+    val familyName: String,
+
+    @Column(nullable = false, unique = true)
+    var email: String,
+
+    @Column(nullable = false)
+    var password: String,
+
+    @Embedded
+    var address: Address? = null,
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+
+    @Column(name = "updated_at", nullable = false)
+    var updatedAt: LocalDateTime = LocalDateTime.now()
+)
+
+@Embeddable
+data class Address(
+    val streetAddress: String,
+    val addressLocality: String,
+    val addressRegion: String,
+    val postalCode: String,
+    val addressCountry: String
+)
