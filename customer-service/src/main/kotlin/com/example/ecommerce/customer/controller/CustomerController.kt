@@ -3,6 +3,8 @@ package com.example.ecommerce.customer.controller
 import com.example.ecommerce.customer.dto.CustomerDto
 import com.example.ecommerce.customer.model.Customer
 import com.example.ecommerce.customer.service.CustomerService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -15,30 +17,42 @@ class CustomerController {
     @Autowired
     private lateinit var customerService: CustomerService
 
+    // Endpoint to register new customer
     @PostMapping("/register")
+    @Operation(summary = "Register new customer")
+    @ApiResponse(responseCode = "200", description = "Successful customer registration")
     fun registerUser(@RequestBody customerDto: CustomerDto): ResponseEntity<Customer> {
         val customer = customerService.registerCustomer(customerDto)
         return ResponseEntity(customer, HttpStatus.CREATED)
     }
 
-    @GetMapping("/{userId}")
-    fun getUserById(@PathVariable userId: Long): ResponseEntity<Customer> {
-        val user = customerService.getCustomerById(userId)
-        return ResponseEntity(user, HttpStatus.OK)
+    // Endpoint to find customer by id
+    @GetMapping("/{customerId}")
+    @Operation(summary = "Find customer by ID")
+    @ApiResponse(responseCode = "200", description = "Successful customer retrieval")
+    fun getUserById(@PathVariable customerId: Long): ResponseEntity<Customer> {
+        val customer = customerService.getCustomerById(customerId)
+        return ResponseEntity(customer, HttpStatus.OK)
     }
 
-    @PutMapping("/{userId}")
+    // Endpoint to update customer
+    @PutMapping("/{customerId}")
+    @Operation(summary = "Update customer")
+    @ApiResponse(responseCode = "200", description = "Successful customer update")
     fun updateUser(
-        @PathVariable userId: Long,
+        @PathVariable customerId: Long,
         @RequestBody request: CustomerDto
     ): ResponseEntity<Customer> {
-        val user = customerService.updateCustomer(request)
-        return ResponseEntity(user, HttpStatus.OK)
+        val customer = customerService.updateCustomer(request)
+        return ResponseEntity(customer, HttpStatus.OK)
     }
 
-    @DeleteMapping("/{userId}")
-    fun deleteUser(@PathVariable userId: Long): ResponseEntity<Void> {
-        customerService.deleteCustomer(userId)
+    // Endpoint to delete user
+    @Operation(summary = "Delete customer")
+    @ApiResponse(responseCode = "200", description = "Successful customer deletion")
+    @DeleteMapping("/{customerId}")
+    fun deleteUser(@PathVariable customerId: Long): ResponseEntity<Void> {
+        customerService.deleteCustomer(customerId)
         return ResponseEntity(HttpStatus.OK)
     }
 }

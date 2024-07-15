@@ -1,11 +1,11 @@
-package com.example.gateway
+package com.example.ecommerce.inventory
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class GatewayApplication
+class InventoryServiceApplication
 
 fun main(args: Array<String>) {
-    runApplication<GatewayApplication>(*args)
+    runApplication<InventoryServiceApplication>(*args)
 }

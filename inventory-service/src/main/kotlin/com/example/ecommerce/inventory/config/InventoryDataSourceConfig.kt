@@ -1,4 +1,4 @@
-package com.example.ecommerce.product.config
+package com.example.ecommerce.inventory.config
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
@@ -17,42 +17,42 @@ import javax.sql.DataSource
 
 @Configuration
 @EnableJpaRepositories(
-    basePackages = ["com.example.ecommerce.product.repository"],
-    entityManagerFactoryRef = "productEntityManagerFactory",
-    transactionManagerRef = "productTransactionManager"
+    basePackages = ["com.example.ecommerce.inventory.repository"],
+    entityManagerFactoryRef = "inventoryEntityManagerFactory",
+    transactionManagerRef = "inventoryTransactionManager"
 )
-class ProductDataSourceConfig {
+class CustomerDataSourceConfig {
     @Autowired
     private val env: Environment? = null
 
     @Bean
-    @ConfigurationProperties(prefix = "datasource.product")
-    fun productDataSourceProperties(): DataSourceProperties {
+    @ConfigurationProperties(prefix = "datasource.inventory")
+    fun inventoryDataSourceProperties(): DataSourceProperties {
         return DataSourceProperties()
     }
 
     @Bean
-    fun productDataSource(): DataSource {
-        val productDataSourceProperties = productDataSourceProperties()
+    fun inventoryDataSource(): DataSource {
+        val inventoryDataSourceProperties = inventoryDataSourceProperties()
         return DataSourceBuilder.create()
-            .driverClassName(productDataSourceProperties.driverClassName)
-            .url(productDataSourceProperties.url)
-            .username(productDataSourceProperties.username)
-            .password(productDataSourceProperties.password)
+            .driverClassName(inventoryDataSourceProperties.driverClassName)
+            .url(inventoryDataSourceProperties.url)
+            .username(inventoryDataSourceProperties.username)
+            .password(inventoryDataSourceProperties.password)
             .build()
     }
 
     @Bean
-    fun productTransactionManager(): PlatformTransactionManager {
-        val factory = productEntityManagerFactory().getObject()
+    fun inventoryTransactionManager(): PlatformTransactionManager {
+        val factory = inventoryEntityManagerFactory().getObject()
         return JpaTransactionManager(factory!!)
     }
 
     @Bean
-    fun productEntityManagerFactory(): LocalContainerEntityManagerFactoryBean {
+    fun inventoryEntityManagerFactory(): LocalContainerEntityManagerFactoryBean {
         val factory = LocalContainerEntityManagerFactoryBean()
-        factory.dataSource = productDataSource()
-        factory.setPackagesToScan(*arrayOf("com.example.ecommerce.product.model"))
+        factory.dataSource = inventoryDataSource()
+        factory.setPackagesToScan(*arrayOf("com.example.ecommerce.inventory.model","com.example.ecommerce.product.model"))
         factory.jpaVendorAdapter = HibernateJpaVendorAdapter()
 
         val jpaProperties = Properties()

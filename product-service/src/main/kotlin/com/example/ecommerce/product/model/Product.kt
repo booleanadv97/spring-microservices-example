@@ -1,5 +1,6 @@
 package com.example.ecommerce.product.model
 
+
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -18,9 +19,6 @@ data class Product(
     @Column(nullable = false)
     var price: Double,
 
-    @Column(nullable = false)
-    var availability: Int, // stock
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     var category: Category? = null,
@@ -29,5 +27,5 @@ data class Product(
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
 )

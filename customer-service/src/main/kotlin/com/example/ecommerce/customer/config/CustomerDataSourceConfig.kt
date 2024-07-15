@@ -57,8 +57,8 @@ class CustomerDataSourceConfig {
 
         val jpaProperties = Properties()
         jpaProperties["hibernate.hbm2ddl.auto"] = env!!.getProperty("spring.jpa.hibernate.ddl-auto")
+        jpaProperties["hibernate.generate-ddl"] = env.getProperty("spring.jpa.generate-ddl")
         jpaProperties["hibernate.show-sql"] = env.getProperty("spring.jpa.show-sql")
-        jpaProperties["hibernate.dialect"] = "org.hibernate.dialect.MySQLDialect"
         factory.setJpaProperties(jpaProperties)
 
         return factory

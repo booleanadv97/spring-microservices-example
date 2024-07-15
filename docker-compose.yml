@@ -1,4 +1,5 @@
 services:
+  # Database Services
   customer-db:
     image: mysql:8.0
     environment:
@@ -10,6 +11,8 @@ services:
       - "3306:3306"
     networks:
       - app-network
+    profiles:
+      - database
 
   product-db:
     image: mysql:8.0
@@ -22,7 +25,10 @@ services:
       - "3307:3306"
     networks:
       - app-network
+    profiles:
+      - database
 
+  # Application services
   customer-service:
     build:
       context: ./customer-service
@@ -38,6 +44,8 @@ services:
       DATASOURCE_CUSTOMER_USERNAME: customer_db_admin
       DATASOURCE_CUSTOMER_PASSWORD: customer_db_admin_password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    profiles:
+      - app
 
   product-service:
     build:
@@ -54,5 +62,25 @@ services:
       DATASOURCE_PRODUCT_USERNAME: product_db_admin
       DATASOURCE_PRODUCT_PASSWORD: product_db_admin_password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    profiles:
+      - app
+
+  inventory-service:
+    build:
+      context: ./inventory-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8080"
+    depends_on:
+      - product-db
+    networks:
+      - app-network
+    environment:
+      DATASOURCE_INVENTORY_URL: jdbc:mysql://product-db:3306/product_db
+      DATASOURCE_INVENTORY_USERNAME: product_db_admin
+      DATASOURCE_INVENTORY_PASSWORD: product_db_admin_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    profiles:
+      - app
 networks:
   app-network:

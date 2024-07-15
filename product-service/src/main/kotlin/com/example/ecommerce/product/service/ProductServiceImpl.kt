@@ -7,7 +7,6 @@ import com.example.ecommerce.product.model.Product
 import com.example.ecommerce.product.repository.CategoryRepository
 import com.example.ecommerce.product.repository.ProductRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -29,7 +28,6 @@ class ProductServiceImpl : ProductService {
             name = productDto.name,
             description = productDto.description,
             price = productDto.price,
-            availability = productDto.availability,
             category = productDto.category
         )
         return productRepository.save(newProduct)
@@ -42,7 +40,6 @@ class ProductServiceImpl : ProductService {
         product.name = productDto.name
         product.description = productDto.description
         product.price = productDto.price
-        product.availability = productDto.availability
         product.category = productDto.category
         product.updatedAt = LocalDateTime.now()
         return productRepository.save(product)
