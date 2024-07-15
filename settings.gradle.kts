@@ -1,5 +1,5 @@
 rootProject.name = "ec"
-include("customer-service", "product-service", "inventory-service")
+include("customer-service", "product-service", "inventory-service", "eureka-server")
 pluginManagement {
     val kotlinVersion: String by settings
     val springBootVersion: String by settings
@@ -21,4 +21,4 @@ pluginManagement {
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
-
+include("eureka-server")

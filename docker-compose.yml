@@ -28,6 +28,17 @@ services:
     profiles:
       - database
 
+  eureka-server:
+    image: eureka-server
+    build:
+      context: ./eureka-server
+    ports:
+      - "8761:8761"
+    profiles:
+      - server
+    networks:
+      - app-network
+
   # Application services
   customer-service:
     build:
@@ -37,6 +48,7 @@ services:
       - "8080:8080"
     depends_on:
       - customer-db
+      - eureka-server
     networks:
       - app-network
     environment:
@@ -44,6 +56,7 @@ services:
       DATASOURCE_CUSTOMER_USERNAME: customer_db_admin
       DATASOURCE_CUSTOMER_PASSWORD: customer_db_admin_password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      EUREKA_CLIENT_SERVICE_URL: http://eureka-server:8761/eureka/
     profiles:
       - app
 
@@ -55,6 +68,7 @@ services:
       - "8081:8080"
     depends_on:
       - product-db
+      - eureka-server
     networks:
       - app-network
     environment:
@@ -62,6 +76,7 @@ services:
       DATASOURCE_PRODUCT_USERNAME: product_db_admin
       DATASOURCE_PRODUCT_PASSWORD: product_db_admin_password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      EUREKA_CLIENT_SERVICE_URL: http://eureka-server:8761/eureka/
     profiles:
       - app
 
@@ -73,6 +88,7 @@ services:
       - "8082:8080"
     depends_on:
       - product-db
+      - eureka-server
     networks:
       - app-network
     environment:
@@ -80,6 +96,7 @@ services:
       DATASOURCE_INVENTORY_USERNAME: product_db_admin
       DATASOURCE_INVENTORY_PASSWORD: product_db_admin_password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      EUREKA_CLIENT_SERVICE_URL: http://eureka-server:8761/eureka/
     profiles:
       - app
 networks:
