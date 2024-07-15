@@ -1,5 +1,6 @@
 package com.example.ecommerce.product.controller
 
+import com.example.ecommerce.product.dto.CategoryDto
 import com.example.ecommerce.product.dto.ProductDto
 import com.example.ecommerce.product.model.Category
 import com.example.ecommerce.product.model.Product
@@ -65,6 +66,16 @@ class ProductController {
         val categories = productService.getCategories()
         return ResponseEntity(categories, HttpStatus.OK)
     }
+
+    // Endpoint to create a new product
+    @Operation(summary = "Register a new category")
+    @ApiResponse(responseCode = "200", description = "Successful category creation")
+    @PostMapping("/registerCategory")
+    fun createCategory(@RequestBody categoryDto: CategoryDto): ResponseEntity<Category> {
+        val newCategory = productService.createCategory(categoryDto)
+        return ResponseEntity(newCategory, HttpStatus.CREATED)
+    }
+
 
     // Endpoint to get a product by name (example of a custom query)
     @Operation(summary = "Get product by name")

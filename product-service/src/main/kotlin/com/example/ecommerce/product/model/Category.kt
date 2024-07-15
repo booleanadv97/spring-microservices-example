@@ -9,5 +9,6 @@ data class Category(
     val id: Long = 0,
 
     @Column(unique = true, nullable = false)
-    val name: String
+    var name: String,
+    var description : String
 )

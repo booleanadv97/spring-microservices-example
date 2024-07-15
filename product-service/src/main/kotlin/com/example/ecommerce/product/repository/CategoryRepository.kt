@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface CategoryRepository : JpaRepository<Category, Long>, QuerydslPredicateExecutor<Product> {
     fun findAllBy(): List<Category>
+    fun findByName(name: String): Category?
 }

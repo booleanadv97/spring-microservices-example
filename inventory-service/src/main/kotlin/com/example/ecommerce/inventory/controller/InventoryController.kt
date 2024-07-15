@@ -1,5 +1,6 @@
 package com.example.ecommerce.inventory.controller
 
+import com.example.ecommerce.inventory.dto.StockDto
 import com.example.ecommerce.inventory.model.Stock
 import com.example.ecommerce.inventory.service.InventoryServiceImpl
 import io.swagger.v3.oas.annotations.Operation
@@ -33,25 +34,25 @@ class InventoryController(private val inventoryService: InventoryServiceImpl) {
     // Endpoint to add a new stock
     @Operation(summary = "Add stock")
     @ApiResponse(responseCode = "200", description = "Successful stock add")
-    @PostMapping
-    fun addStock(@RequestBody stock: Stock): ResponseEntity<Stock> {
-        val newStock = inventoryService.addStock(stock)
+    @PostMapping("/register")
+    fun addStock(@RequestBody stockDto: StockDto): ResponseEntity<Stock> {
+        val newStock = inventoryService.addStock(stockDto)
         return ResponseEntity(newStock, HttpStatus.CREATED)
     }
 
     // Endpoint to delete stock
     @Operation(summary = "Delete stock")
     @ApiResponse(responseCode = "200", description = "Successful stock deletion")
-    @DeleteMapping
-    fun deleteStock(@RequestBody id: Long): ResponseEntity<Void> {
-        inventoryService.deleteStock(id)
+    @DeleteMapping("/{productId}")
+    fun deleteStock(@PathVariable productId: Long): ResponseEntity<Void> {
+        inventoryService.deleteStock(productId)
         return ResponseEntity(HttpStatus.OK)
     }
 
     // Endpoint to get all stocks
     @Operation(summary = "Get all stocks")
     @ApiResponse(responseCode = "200", description = "Successful retrieval of stocks")
-    @GetMapping
+    @GetMapping("/")
     fun getAllStocks(): ResponseEntity<List<Stock>> {
         val stocks = inventoryService.getAllStocks()
         return ResponseEntity(stocks, HttpStatus.OK)
