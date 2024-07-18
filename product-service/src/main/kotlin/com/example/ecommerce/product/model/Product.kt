@@ -19,13 +19,12 @@ data class Product(
     @Column(nullable = false)
     var price: Double,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    var category: Category? = null,
+    @Column(nullable = false)
+    var categoryId: Long,
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
-    @Column(name = "updated_at", nullable = false)
+    @Column( nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 )

@@ -8,5 +8,5 @@ interface CustomerService {
     fun updateCustomer(customerDto: CustomerDto): Customer?
     fun deleteCustomer(id: Long)
     fun getCustomerById(id: Long): Customer?
-    fun getCustomerByEmail(email: String?): Customer?
+    fun getCustomerByEmail(email: String): Customer?
 }

@@ -5,20 +5,16 @@ import com.example.ecommerce.customer.model.Customer
 import com.example.ecommerce.customer.repository.CustomerRepository
 import com.example.ecommerce.product.exception.InvalidParameterException
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 
 @Service
-class CustomerServiceImpl : CustomerService {
+class CustomerServiceImpl(@Autowired private val customerRepository: CustomerRepository) : CustomerService {
 
-    @Autowired
-    private val customerRepository: CustomerRepository ? = null
 
     override fun registerCustomer(customerDto: CustomerDto): Customer {
-        if (customerRepository!!.findByEmail(customerDto.email) != null) {
-            throw InvalidParameterException("Customer with email ${customerDto.email} already exists.")
-        }
         // Create a new Customer object
         val newCustomer = Customer(
             givenName = customerDto.givenName,
@@ -34,35 +30,30 @@ class CustomerServiceImpl : CustomerService {
 
     override fun updateCustomer(customerDto: CustomerDto): Customer? {
         // Check for customer existence
-        val customer = customerRepository!!.findById(customerDto.id)
-            .orElseThrow { InvalidParameterException("Customer with id ${customerDto.id} not found") }
+        val customer = customerRepository.findByIdOrNull(customerDto.id) ?: throw InvalidParameterException("Customer (ID: ${customerDto.id} not found")
         // Update customer data
         customer.email = customerDto.email
         customer.password = customerDto.password
         customer.address = customerDto.address
         customer.updatedAt = LocalDateTime.now()
-
         // Return updated customer
         return customerRepository.save(customer)
     }
 
     override fun deleteCustomer(id: Long) {
         // Find customer registered account otherwise launch exception
-        val customer = customerRepository!!.findById(id)
-            .orElseThrow { InvalidParameterException("Customer with id $id not found") }
+        val customer = customerRepository.findByIdOrNull(id) ?: throw InvalidParameterException("Customer (ID: $id not found)")
         // Delete customer from repository
         customerRepository.delete(customer)
     }
 
     override fun getCustomerById(id: Long): Customer? {
         // Search for the customer with the given id, throw exception if not found
-        return customerRepository!!.findById(id)
-            .orElseThrow { InvalidParameterException("Customer with id $id not found")  }
+        return customerRepository.findByIdOrNull(id)?: throw InvalidParameterException("Customer (ID: $id not found)")
     }
 
-    override fun getCustomerByEmail(email: String?): Customer? {
-        // Check for null argument
-        email ?: throw IllegalArgumentException("Email must not be null")
-        return customerRepository!!.findByEmail(email) ?: throw InvalidParameterException("Customer with email $email not found")
+    override fun getCustomerByEmail(email: String): Customer? {
+        // Search for the customer with the given email, throw exception if not found
+        return customerRepository.findByEmail(email) ?: throw InvalidParameterException("Customer with email $email not found")
     }
 }

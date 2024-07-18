@@ -76,7 +76,6 @@ class ProductController {
         return ResponseEntity(newCategory, HttpStatus.CREATED)
     }
 
-
     // Endpoint to get a product by name (example of a custom query)
     @Operation(summary = "Get product by name")
     @ApiResponse(responseCode = "200", description = "Successful product retrieval")

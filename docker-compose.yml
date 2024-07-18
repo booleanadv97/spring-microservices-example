@@ -13,6 +13,8 @@ services:
       - app-network
     profiles:
       - database
+    volumes:
+      - customer_db_data:/var/lib/mysql
 
   product-db:
     image: mysql:8.0
@@ -27,7 +29,10 @@ services:
       - app-network
     profiles:
       - database
+    volumes:
+      - product_db_data:/var/lib/mysql
 
+# Spring Cloud - Netflix Eureka Server
   eureka-server:
     image: eureka-server
     build:
@@ -68,6 +73,7 @@ services:
       - "8081:8081"
     depends_on:
       - product-db
+      - kafka
       - eureka-server
     networks:
       - app-network
@@ -77,6 +83,7 @@ services:
       DATASOURCE_PRODUCT_PASSWORD: product_db_admin_password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       EUREKA_CLIENT_SERVICE_URL: http://eureka-server:8761/eureka/
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     profiles:
       - app
 
@@ -88,6 +95,8 @@ services:
       - "8082:8082"
     depends_on:
       - product-db
+      - product-service
+      - kafka
       - eureka-server
     networks:
       - app-network
@@ -97,8 +106,47 @@ services:
       DATASOURCE_INVENTORY_PASSWORD: product_db_admin_password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       EUREKA_CLIENT_SERVICE_URL: http://eureka-server:8761/eureka/
-      PRODUCT_SERVICE_URL: http://product-service:8081
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     profiles:
       - app
+  zookeeper:
+    image: confluentinc/cp-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+    networks:
+      - app-network
+
+  kafka:
+    image: confluentinc/cp-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+    depends_on:
+      - zookeeper
+    networks:
+      - app-network
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    environment:
+      KAFKA_CLUSTERS_0_NAME: "local-kafka"
+      KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: "kafka:9092"
+    ports:
+      - "9090:8080"
+    depends_on:
+      - kafka
+    networks:
+      - app-network
+
 networks:
   app-network:
+
+volumes:
+  product_db_data:
+  customer_db_data:

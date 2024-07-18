@@ -10,5 +10,6 @@ data class Category(
 
     @Column(unique = true, nullable = false)
     var name: String,
+    @Column(nullable = false)
     var description : String
 )
