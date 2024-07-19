@@ -1,0 +1,44 @@
+# Server Configuration
+server:
+  port: 8083  # Port where the server will run
+
+# Spring Application Configuration
+spring:
+  application:
+    name: inventory-service  # Name of the Spring application
+
+  # Datasource Configuration for MySQL
+  datasource:
+    inventory:
+      driver-class-name: com.mysql.cj.jdbc.Driver  # JDBC driver class name
+      url: jdbc:mysql://product-db:3307/product_db  # URL of the MySQL database
+      username: product_db_admin  # Username for the MySQL database
+      password: product_db_admin_password  # Password for the MySQL database
+
+  # JPA Configuration
+  jpa:
+    generate-ddl: true  # Automatically generate database schema
+    hibernate:
+      ddl-auto: update  # Update the database schema on startup
+    show-sql: true  # Show SQL statements in the logs
+
+  # Kafka Consumer Configuration
+  kafka:
+    consumer:
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}  # Kafka bootstrap servers
+      group-id: inventory_service_group  # Kafka consumer group ID
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/  # Eureka server URL
+  instance:
+    prefer-ip-address: true  # Prefer IP address for the Eureka instance
+
+# Springdoc Configuration
+springdoc:
+  api-docs:
+    path: /inventory/v3/api-docs  # Path for API documentation
+  swagger-ui:
+    path: /inventory/swagger-ui.html  # Path for Swagger UI

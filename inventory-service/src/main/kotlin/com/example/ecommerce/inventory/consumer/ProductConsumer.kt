@@ -1,6 +1,7 @@
-package com.example.ecommerce.inventory.service
+package com.example.ecommerce.inventory.consumer
 
 import com.example.ecommerce.inventory.dto.StockDto
+import com.example.ecommerce.inventory.service.InventoryService
 import com.example.ecommerce.product.model.Product
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.annotation.KafkaListener

@@ -1,0 +1,42 @@
+# Server Configuration
+server:
+  port: 8082  # Port where the server will run
+
+# Spring Application Name
+spring:
+  application:
+    name: product-service  # Name of the Spring application
+
+  # Datasource Configuration for MySQL
+  datasource:
+    product:
+      driver-class-name: com.mysql.cj.jdbc.Driver  # JDBC driver class name
+      url: jdbc:mysql://product-db:3307/product_db  # URL of the MySQL database
+      username: product_db_admin  # Username for the MySQL database
+      password: product_db_admin_password  # Password for the MySQL database
+
+  # JPA Configuration
+  jpa:
+    generate-ddl: true  # Automatically generate database schema
+    hibernate:
+      ddl-auto: update  # Update the database schema on startup
+    show-sql: true  # Show SQL statements in the logs
+
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}  # Kafka bootstrap servers
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/  # Eureka server URL
+  instance:
+    prefer-ip-address: true  # Prefer IP address for the Eureka instance
+
+# Swagger Configuration
+springdoc:
+  api-docs:
+    path: /products/v3/api-docs  # Path for API documentation
+  swagger-ui:
+    path: /products/swagger-ui.html  # Path for Swagger UI
