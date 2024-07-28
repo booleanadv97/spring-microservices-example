@@ -1,11 +1,12 @@
 package com.example.ecommerce.gateway
 
+import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.runApplication
+
 
 @SpringBootApplication
 class GatewayApplication
 
 fun main(args: Array<String>) {
-    runApplication<GatewayApplication>(*args)
+    SpringApplication.run(GatewayApplication::class.java, *args)
 }

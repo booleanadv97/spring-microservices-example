@@ -1,5 +1,7 @@
 services:
   # Database Services
+
+  # Customer service database
   customer-db:
     image: mysql:8.0
     environment:
@@ -9,13 +11,10 @@ services:
       MYSQL_ROOT_PASSWORD: customer_db_admin_password
     ports:
       - "3306:3306"
-    networks:
-      - app-network
-    profiles:
-      - database
     volumes:
       - customer_db_data:/var/lib/mysql
 
+  # Product service database
   product-db:
     image: mysql:8.0
     environment:
@@ -25,24 +24,16 @@ services:
       MYSQL_ROOT_PASSWORD: product_db_admin_password
     ports:
       - "3307:3306"
-    networks:
-      - app-network
-    profiles:
-      - database
     volumes:
       - product_db_data:/var/lib/mysql
 
-# Spring Cloud Netflix Eureka
+  # Spring Cloud Netflix Eureka
   eureka-server:
     image: eureka-server
     build:
       context: ./eureka-server
     ports:
       - "8761:8761"
-    profiles:
-      - server
-    networks:
-      - app-network
 
   # Spring Cloud Gateway
   gateway:
@@ -57,10 +48,10 @@ services:
       - product-service
       - inventory-service
       - customer-service
-    networks:
-      - app-network
 
   # Application services
+
+  # Customer service
   customer-service:
     build:
       context: ./customer-service
@@ -69,18 +60,17 @@ services:
       - "8081:8080"
     depends_on:
       - customer-db
+      - keycloak
       - eureka-server
-    networks:
-      - app-network
     environment:
+      SPRING_SECURITY_OAUTH2_RESOURCE-SERVER_JWT_ISSUER_URI: http://keycloak:8090/realms/ecommerce
       DATASOURCE_CUSTOMER_URL: jdbc:mysql://customer-db:3306/customer_db
       DATASOURCE_CUSTOMER_USERNAME: customer_db_admin
       DATASOURCE_CUSTOMER_PASSWORD: customer_db_admin_password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-    profiles:
-      - app
 
+  # Product service
   product-service:
     build:
       context: ./product-service
@@ -91,8 +81,6 @@ services:
       - product-db
       - kafka
       - eureka-server
-    networks:
-      - app-network
     environment:
       DATASOURCE_PRODUCT_URL: jdbc:mysql://product-db:3306/product_db
       DATASOURCE_PRODUCT_USERNAME: product_db_admin
@@ -100,9 +88,8 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    profiles:
-      - app
 
+  # Inventory service
   inventory-service:
     build:
       context: ./inventory-service
@@ -114,8 +101,6 @@ services:
       - product-service
       - kafka
       - eureka-server
-    networks:
-      - app-network
     environment:
       DATASOURCE_INVENTORY_URL: jdbc:mysql://product-db:3306/product_db
       DATASOURCE_INVENTORY_USERNAME: product_db_admin
@@ -123,18 +108,16 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    profiles:
-      - app
 
+  # Zookeeper
   zookeeper:
     image: confluentinc/cp-zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
     ports:
       - "2181:2181"
-    networks:
-      - app-network
 
+  # Kafka
   kafka:
     image: confluentinc/cp-kafka
     ports:
@@ -146,9 +129,8 @@ services:
       KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
     depends_on:
       - zookeeper
-    networks:
-      - app-network
 
+  # Kafka UI
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     environment:
@@ -158,12 +140,57 @@ services:
       - "9090:8080"
     depends_on:
       - kafka
-    networks:
-      - app-network
 
-networks:
-  app-network:
+  # Keycloak database
+  keycloak-db:
+    image: postgres:12
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    volumes:
+      - keycloak-db-data:/var/lib/postgresql/data
+
+  # Keycloak
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: keycloak-db
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command:
+      - "start-dev"
+    ports:
+      - "8090:8080"
+    depends_on:
+      - keycloak-db
+
+  # Keycloak Initializer
+  keycloak-initializer:
+    build:
+      context: ./keycloak
+      dockerfile: Dockerfile
+    ports:
+      - "8080"
+    environment:
+      KEYCLOAK_SERVER_URL: http://keycloak:8080
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_ADMIN: admin
+      PRODUCT_SERVICE_CLIENT_ID: product-service-client
+      PRODUCT_SERVICE_CLIENT_SECRET: product-service-client-secret
+      CUSTOMER_SERVICE_CLIENT_ID: customer-service-client
+      CUSTOMER_SERVICE_CLIENT_SECRET: customer-service-client-secret
+      INVENTORY_SERVICE_CLIENT_ID: inventory-service-client
+      INVENTORY_SERVICE_CLIENT_SECRET: inventory-service-client-secret
+    depends_on:
+      - keycloak
 
 volumes:
   product_db_data:
   customer_db_data:
+  keycloak-db-data:
+

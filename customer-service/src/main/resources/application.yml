@@ -6,6 +6,12 @@ server:
 spring:
   application:
     name: customer-service  # Name of the Spring application
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCE-SERVER_JWT_ISSUER_URI}
+          jwk-set-uri: ${spring.security.oauth2.resource-server.jwt.issuer-uri}/protocol/openid-connect/certs
 
   # Datasource Configuration for MySQL
   datasource:
@@ -36,3 +42,4 @@ springdoc:
     path: /customers/v3/api-docs  # Path for API documentation
   swagger-ui:
     path: /customers/swagger-ui.html  # Path for Swagger UI
+

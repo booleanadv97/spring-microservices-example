@@ -8,11 +8,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 
 @RestController
-@RequestMapping("/customers")
+@RequestMapping("/customers/api")
 class CustomerController {
 
     @Autowired
@@ -29,6 +30,7 @@ class CustomerController {
 
     // Endpoint to find customer by id
     @GetMapping("/{customerId}")
+    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "Find customer by ID")
     @ApiResponse(responseCode = "200", description = "Successful customer retrieval")
     fun getUserById(@PathVariable customerId: Long): ResponseEntity<Customer> {
@@ -38,6 +40,7 @@ class CustomerController {
 
     // Endpoint to update customer
     @PutMapping("/{customerId}")
+    @PreAuthorize("hasAnyAuthority('PROVIDERS')")
     @Operation(summary = "Update customer")
     @ApiResponse(responseCode = "200", description = "Successful customer update")
     fun updateUser(
@@ -49,6 +52,7 @@ class CustomerController {
     }
 
     // Endpoint to delete user
+    @PreAuthorize("hasAnyAuthority('PROVIDERS')")
     @Operation(summary = "Delete customer")
     @ApiResponse(responseCode = "200", description = "Successful customer deletion")
     @DeleteMapping("/{customerId}")

@@ -4,6 +4,8 @@ server:
 
 # Spring Application Name
 spring:
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: product-service  # Name of the Spring application
 
@@ -40,3 +42,5 @@ springdoc:
     path: /products/v3/api-docs  # Path for API documentation
   swagger-ui:
     path: /products/swagger-ui.html  # Path for Swagger UI
+
+
