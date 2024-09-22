@@ -1,0 +1,41 @@
+# Server port
+server:
+  port: 8084
+
+# Keycloak Configuration
+keycloak:
+  serverUrl: ${KEYCLOAK_SERVER_URL}
+  realm: master
+  admin:
+    password: ${KEYCLOAK_ADMIN_PASSWORD}
+    username: ${KEYCLOAK_ADMIN}
+  resource: admin-cli
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/  # Eureka server URL
+  instance:
+    prefer-ip-address: true  # Prefer IP address for the Eureka instance
+
+# Kafka Consumer Configuration
+spring:
+  application:
+    name: keycloak-service  # Name of the Spring application
+  kafka:
+    consumer:
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}  # Kafka bootstrap servers
+      group-id: keycloak_service_group  # Kafka consumer group ID
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs
+
+# Springdoc Configuration
+springdoc:
+  api-docs:
+    path: /keycloak/v3/api-docs  # Path for API documentation
+  swagger-ui:
+    path: /keycloak/swagger-ui.html  # Path for Swagger UI

@@ -15,6 +15,9 @@ data class Customer(
     @Column(nullable = false)
     val familyName: String,
 
+    @Column(nullable = false)
+    val username: String,
+
     @Column(nullable = false, unique = true)
     var email: String,
 

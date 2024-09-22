@@ -1,6 +1,19 @@
 services:
   # Database Services
 
+  # Cart service database
+  cart-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: cart_db
+      MYSQL_USER: cart_db_admin
+      MYSQL_PASSWORD: cart_db_admin_password
+      MYSQL_ROOT_PASSWORD: cart_db_admin_password
+    ports:
+      - "3308:3306"
+    volumes:
+      - cart_db_data:/var/lib/mysql
+
   # Customer service database
   customer-db:
     image: mysql:8.0
@@ -48,6 +61,7 @@ services:
       - product-service
       - inventory-service
       - customer-service
+      - keycloak-service
 
   # Application services
 
@@ -61,12 +75,33 @@ services:
     depends_on:
       - customer-db
       - keycloak
+      - kafka
       - eureka-server
     environment:
-      SPRING_SECURITY_OAUTH2_RESOURCE-SERVER_JWT_ISSUER_URI: http://keycloak:8090/realms/ecommerce
       DATASOURCE_CUSTOMER_URL: jdbc:mysql://customer-db:3306/customer_db
       DATASOURCE_CUSTOMER_USERNAME: customer_db_admin
       DATASOURCE_CUSTOMER_PASSWORD: customer_db_admin_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+
+  # Cart service
+  cart-service:
+    build:
+      context: ./cart-service
+      dockerfile: Dockerfile
+    ports:
+      - "8085:8080"
+    depends_on:
+      - cart-db
+      - keycloak-service
+      - keycloak
+      - kafka
+      - eureka-server
+    environment:
+      DATASOURCE_CART_URL: jdbc:mysql://cart-db:3306/cart_db
+      DATASOURCE_CART_USERNAME: cart_db_admin
+      DATASOURCE_CART_PASSWORD: cart_db_admin_password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
 
@@ -79,6 +114,8 @@ services:
       - "8082:8080"
     depends_on:
       - product-db
+      - keycloak-service
+      - keycloak
       - kafka
       - eureka-server
     environment:
@@ -99,6 +136,8 @@ services:
     depends_on:
       - product-db
       - product-service
+      - keycloak-service
+      - keycloak
       - kafka
       - eureka-server
     environment:
@@ -169,13 +208,13 @@ services:
     depends_on:
       - keycloak-db
 
-  # Keycloak Initializer
-  keycloak-initializer:
+  # Keycloak Service
+  keycloak-service:
     build:
-      context: ./keycloak
+      context: ./keycloak-service
       dockerfile: Dockerfile
     ports:
-      - "8080"
+      - "8084:8080"
     environment:
       KEYCLOAK_SERVER_URL: http://keycloak:8080
       KEYCLOAK_ADMIN_PASSWORD: admin
@@ -186,11 +225,16 @@ services:
       CUSTOMER_SERVICE_CLIENT_SECRET: customer-service-client-secret
       INVENTORY_SERVICE_CLIENT_ID: inventory-service-client
       INVENTORY_SERVICE_CLIENT_SECRET: inventory-service-client-secret
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
     depends_on:
       - keycloak
+      - kafka
+      - eureka-server
 
 volumes:
   product_db_data:
   customer_db_data:
+  cart_db_data:
   keycloak-db-data:
 

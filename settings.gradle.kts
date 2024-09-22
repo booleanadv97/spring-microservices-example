@@ -1,5 +1,5 @@
 rootProject.name = "ecommerce"
-include("keycloak", "eureka-server", "gateway", "customer-service", "product-service", "inventory-service")
+include("keycloak-service", "cart-service", "eureka-server", "gateway", "customer-service", "product-service", "inventory-service")
 pluginManagement {
     val kotlinVersion: String by settings
     val springBootVersion: String by settings
@@ -21,3 +21,4 @@ pluginManagement {
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
+

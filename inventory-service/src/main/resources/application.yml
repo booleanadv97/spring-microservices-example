@@ -15,6 +15,13 @@ spring:
       username: product_db_admin  # Username for the MySQL database
       password: product_db_admin_password  # Password for the MySQL database
 
+  # Keycloak Configuration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs
+
   # JPA Configuration
   jpa:
     generate-ddl: true  # Automatically generate database schema

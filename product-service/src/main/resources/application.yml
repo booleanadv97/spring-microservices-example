@@ -9,6 +9,13 @@ spring:
   application:
     name: product-service  # Name of the Spring application
 
+  # Keycloak configuration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs
+
   # Datasource Configuration for MySQL
   datasource:
     product:

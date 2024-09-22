@@ -9,4 +9,5 @@ interface InventoryService {
     fun addStock(stockDto: StockDto): Stock
     fun deleteStock(productId: Long)
     fun getAllStocks(): List<Stock>
+    fun checkAvailability(productId: Long, quantity: Int):Boolean
 }

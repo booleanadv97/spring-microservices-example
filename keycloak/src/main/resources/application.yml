@@ -1,7 +1,0 @@
-keycloak:
-  serverUrl: ${KEYCLOAK_SERVER_URL}
-  realm: master
-  admin:
-    password: ${KEYCLOAK_ADMIN_PASSWORD}
-    username: ${KEYCLOAK_ADMIN}
-  resource: admin-cli

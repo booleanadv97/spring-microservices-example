@@ -2,7 +2,6 @@ package com.example.ecommerce.product.service
 
 import com.example.ecommerce.product.dto.CategoryDto
 import com.example.ecommerce.product.dto.ProductDto
-import com.example.ecommerce.product.exception.InvalidParameterException
 import com.example.ecommerce.product.model.Category
 import com.example.ecommerce.product.model.Product
 import com.example.ecommerce.product.repository.CategoryRepository
@@ -12,7 +11,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-
 
 @Service
 class ProductServiceImpl(@Autowired private var categoryRepository: CategoryRepository,
@@ -24,7 +22,7 @@ class ProductServiceImpl(@Autowired private var categoryRepository: CategoryRepo
 
     override fun createProduct(productDto: ProductDto): Product {
         // Check if category exists
-        categoryRepository.findByIdOrNull(productDto.categoryId)?: throw IllegalArgumentException("Category ${productDto.categoryId} not found")
+        categoryRepository.findByIdOrNull(productDto.categoryId)?: throw RuntimeException("Category ${productDto.categoryId} not found")
         val newProduct = Product(
             name = productDto.name,
             description = productDto.description,
@@ -38,8 +36,8 @@ class ProductServiceImpl(@Autowired private var categoryRepository: CategoryRepo
 
     override fun updateProduct(id: Long, productDto: ProductDto): Product {
         // Check if category exists
-        categoryRepository.findByIdOrNull(productDto.categoryId)?: throw IllegalArgumentException("Category ${productDto.categoryId} not found")
-        val product = productRepository.findByIdOrNull(id)?: throw IllegalArgumentException("Product (ID: $id) not found")
+        categoryRepository.findByIdOrNull(productDto.categoryId)?: throw RuntimeException("Category ${productDto.categoryId} not found")
+        val product = productRepository.findByIdOrNull(id)?: throw RuntimeException("Product (ID: $id) not found")
         product.name = productDto.name
         product.description = productDto.description
         product.price = productDto.price
@@ -49,12 +47,12 @@ class ProductServiceImpl(@Autowired private var categoryRepository: CategoryRepo
     }
 
     override fun deleteProduct(id: Long) {
-        val product = productRepository.findByIdOrNull(id)?: throw IllegalArgumentException("Product (ID: $id) not found")
+        val product = productRepository.findByIdOrNull(id)?: throw RuntimeException("Product (ID: $id) not found")
         productRepository.delete(product)
     }
 
     override fun getProductById(id: Long): Product {
-        return productRepository.findByIdOrNull(id) ?: throw IllegalArgumentException("Product (ID: $id) not found")
+        return productRepository.findByIdOrNull(id) ?: throw RuntimeException("Product (ID: $id) not found")
     }
 
     override fun getCategories(): List<Category> {
@@ -64,14 +62,14 @@ class ProductServiceImpl(@Autowired private var categoryRepository: CategoryRepo
     override fun createCategory(categoryDto: CategoryDto): Category {
         // Check if category exists
         if(categoryRepository.findByName(categoryDto.name) != null)
-            throw InvalidParameterException("Category ${categoryDto.name} already exists.")
+            throw RuntimeException("Category ${categoryDto.name} already exists.")
         val category = Category(name = categoryDto.name, description = categoryDto.description)
         return categoryRepository.save(category)
 
     }
 
     override fun getProductByName(name: String): Product? {
-        val product = productRepository.findByName(name) ?: throw InvalidParameterException("Product $name not found")
+        val product = productRepository.findByName(name) ?: throw RuntimeException("Product $name not found")
         return product
     }
 }

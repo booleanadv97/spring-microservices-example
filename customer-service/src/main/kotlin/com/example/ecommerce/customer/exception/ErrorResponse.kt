@@ -1,4 +1,4 @@
-package com.example.ecommerce.product.exception
+package com.example.ecommerce.customer.exception
 
 import java.time.LocalDateTime
 

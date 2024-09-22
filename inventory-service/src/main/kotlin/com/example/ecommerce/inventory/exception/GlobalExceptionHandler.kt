@@ -9,24 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 @ControllerAdvice
 class GlobalExceptionHandler {
 
-    @ExceptionHandler(MissingParameterException::class)
-    fun handleMissingParameterException(ex: MissingParameterException): ResponseEntity<ErrorResponse> {
-        val errorResponse = ErrorResponse(
-            status = HttpStatus.BAD_REQUEST.value(),
-            message = ex.message ?: "Missing parameter"
-        )
-        return ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST)
-    }
-
-    @ExceptionHandler(InvalidParameterException::class)
-    fun handleInvalidParameterException(ex: InvalidParameterException): ResponseEntity<ErrorResponse> {
-        val errorResponse = ErrorResponse(
-            status = HttpStatus.BAD_REQUEST.value(),
-            message = ex.message ?: "Invalid parameter"
-        )
-        return ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST)
-    }
-
     @ExceptionHandler(Exception::class)
     fun handleGeneralException(ex: Exception): ResponseEntity<ErrorResponse> {
         val errorResponse = ErrorResponse(
