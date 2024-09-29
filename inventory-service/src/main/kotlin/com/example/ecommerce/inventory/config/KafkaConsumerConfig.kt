@@ -1,6 +1,7 @@
 package com.example.ecommerce.inventory.config
 
-import com.example.ecommerce.product.model.Product
+import com.example.ecommerce.common.dto.order.OrderEvent
+import com.example.ecommerce.common.dto.product.ProductEventDTO
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.springframework.beans.factory.annotation.Value
@@ -23,7 +24,7 @@ class KafkaConsumerConfig {
     private lateinit var kafkaConsumerGroupId: String
 
     @Bean
-    fun consumerFactory(): ConsumerFactory<String, Product> {
+    fun productConsumerFactory(): ConsumerFactory<String, ProductEventDTO> {
         val configProps: MutableMap<String, Any> = HashMap()
         configProps[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaBootstrapServers
         configProps[ConsumerConfig.GROUP_ID_CONFIG] = kafkaConsumerGroupId
@@ -34,9 +35,27 @@ class KafkaConsumerConfig {
     }
 
     @Bean
-    fun kafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, Product> {
-        val factory = ConcurrentKafkaListenerContainerFactory<String, Product>()
-        factory.consumerFactory = consumerFactory()
+    fun productKafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, ProductEventDTO> {
+        val factory = ConcurrentKafkaListenerContainerFactory<String, ProductEventDTO>()
+        factory.consumerFactory = productConsumerFactory()
+        return factory
+    }
+
+    @Bean
+    fun orderConsumerFactory(): ConsumerFactory<String, OrderEvent> {
+        val configProps: MutableMap<String, Any> = HashMap()
+        configProps[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaBootstrapServers
+        configProps[ConsumerConfig.GROUP_ID_CONFIG] = kafkaConsumerGroupId
+        configProps[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
+        configProps[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JsonDeserializer::class.java
+        configProps[JsonDeserializer.TRUSTED_PACKAGES] = "*"
+        return DefaultKafkaConsumerFactory(configProps)
+    }
+
+    @Bean
+    fun orderKafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, OrderEvent> {
+        val factory = ConcurrentKafkaListenerContainerFactory<String, OrderEvent>()
+        factory.consumerFactory = orderConsumerFactory()
         return factory
     }
 }

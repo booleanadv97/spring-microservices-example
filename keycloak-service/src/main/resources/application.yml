@@ -19,7 +19,6 @@ eureka:
   instance:
     prefer-ip-address: true  # Prefer IP address for the Eureka instance
 
-# Kafka Consumer Configuration
 spring:
   application:
     name: keycloak-service  # Name of the Spring application

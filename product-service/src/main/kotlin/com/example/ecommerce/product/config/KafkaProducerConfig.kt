@@ -1,6 +1,6 @@
 package com.example.ecommerce.product.config
 
-import com.example.ecommerce.product.model.Product
+import com.example.ecommerce.common.dto.product.ProductEventDTO
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.beans.factory.annotation.Value
@@ -20,7 +20,7 @@ class KafkaProducerConfig{
     private lateinit var kafkaBootstrapServers: String
 
     @Bean
-    fun producerFactory(): ProducerFactory<String, Product> {
+    fun productEventProducerFactory(): ProducerFactory<String, ProductEventDTO> {
         val configProps: MutableMap<String, Any> = HashMap()
         configProps[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaBootstrapServers
         configProps[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
@@ -28,8 +28,8 @@ class KafkaProducerConfig{
         return DefaultKafkaProducerFactory(configProps)
     }
 
-    @Bean
-    fun kafkaTemplate(): KafkaTemplate<String, Product> {
-        return KafkaTemplate(producerFactory())
+    @Bean(name = ["productEventTemplate"])
+    fun productEventTemplate(): KafkaTemplate<String, ProductEventDTO> {
+        return KafkaTemplate(productEventProducerFactory())
     }
 }

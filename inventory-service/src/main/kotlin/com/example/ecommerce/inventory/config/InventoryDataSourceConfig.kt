@@ -21,7 +21,7 @@ import javax.sql.DataSource
     entityManagerFactoryRef = "inventoryEntityManagerFactory",
     transactionManagerRef = "inventoryTransactionManager"
 )
-class CustomerDataSourceConfig {
+class InventoryDataSourceConfig {
     @Autowired
     private val env: Environment? = null
 
@@ -52,7 +52,7 @@ class CustomerDataSourceConfig {
     fun inventoryEntityManagerFactory(): LocalContainerEntityManagerFactoryBean {
         val factory = LocalContainerEntityManagerFactoryBean()
         factory.dataSource = inventoryDataSource()
-        factory.setPackagesToScan(*arrayOf("com.example.ecommerce.inventory.model","com.example.ecommerce.product.model"))
+        factory.setPackagesToScan(*arrayOf("com.example.ecommerce.inventory.model"))
         factory.jpaVendorAdapter = HibernateJpaVendorAdapter()
 
         val jpaProperties = Properties()

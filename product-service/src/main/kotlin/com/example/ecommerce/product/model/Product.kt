@@ -1,6 +1,5 @@
 package com.example.ecommerce.product.model
 
-
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -8,7 +7,7 @@ import java.time.LocalDateTime
 data class Product(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val productId: Long = 0,
 
     @Column(nullable = false)
     var name: String,

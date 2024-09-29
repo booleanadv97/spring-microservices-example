@@ -1,6 +1,6 @@
 package com.example.ecommerce.customer.config
 
-import com.example.ecommerce.customer.dto.CustomerRegistration
+import com.example.ecommerce.common.dto.customer.KeycloakCustomerEventDto
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.beans.factory.annotation.Value
@@ -14,22 +14,28 @@ import org.springframework.kafka.support.serializer.JsonSerializer
 
 @EnableKafka
 @Configuration
-class KafkaProducerConfig{
+class KafkaProducerConfig {
 
     @Value("\${spring.kafka.bootstrap-servers}")
     private lateinit var kafkaBootstrapServers: String
 
     @Bean
-    fun producerFactory(): ProducerFactory<String, CustomerRegistration> {
+    fun keycloakCustomerEventProducerFactory(): ProducerFactory<String, KeycloakCustomerEventDto> {
         val configProps: MutableMap<String, Any> = HashMap()
+
+        // Basic producer properties
         configProps[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaBootstrapServers
         configProps[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
         configProps[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = JsonSerializer::class.java
-        return DefaultKafkaProducerFactory(configProps)
+
+        val jsonSerializer = JsonSerializer<KeycloakCustomerEventDto>().apply {
+            setAddTypeInfo(false)
+        }
+        return DefaultKafkaProducerFactory(configProps, StringSerializer(), jsonSerializer)
     }
 
-    @Bean
-    fun kafkaTemplate(): KafkaTemplate<String, CustomerRegistration> {
-        return KafkaTemplate(producerFactory())
+    @Bean(name = ["keycloakCustomerEventTemplate"])
+    fun keycloakCustomerEventTemplate(): KafkaTemplate<String, KeycloakCustomerEventDto> {
+        return KafkaTemplate(keycloakCustomerEventProducerFactory())
     }
 }

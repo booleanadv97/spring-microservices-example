@@ -1,6 +1,6 @@
 package com.example.ecommerce.keycloak.consumer
 
-import com.example.ecommerce.customer.dto.CustomerRegistration
+import com.example.ecommerce.common.dto.customer.KeycloakCustomerEventDto
 import com.example.ecommerce.keycloak.service.KeycloakService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.annotation.KafkaListener
@@ -10,37 +10,32 @@ import org.springframework.stereotype.Service
 class CustomerConsumer(@Autowired val keycloakService: KeycloakService) {
     @KafkaListener(
         groupId = "\${spring.kafka.consumer.group-id}",
-        topics = ["register_customer"]
+        topics = ["customer_keycloak_events"],
+        containerFactory = "customerKafkaListenerContainerFactory"
     )
-    fun consumeRegister(customerRegistration: CustomerRegistration) {
-        try {
-            keycloakService.registerCustomer(customerRegistration)
-        } catch (e: Exception) {
-            println("Error processing registration for user ${customerRegistration.customer.username}: ${e.message}")
-        }
-    }
-
-    @KafkaListener(
-        groupId = "\${spring.kafka.consumer.group-id}",
-        topics = ["update_customer"]
-    )
-    fun consumeUpdate(customerRegistration: CustomerRegistration) {
-        try {
-            keycloakService.updateCustomer(customerRegistration)
-        } catch (e: Exception) {
-            println("Error processing update for user ${customerRegistration.customer.username}: ${e.message}")
-        }
-    }
-
-    @KafkaListener(
-        groupId = "\${spring.kafka.consumer.group-id}",
-        topics = ["delete_customer"]
-    )
-    fun consumeDelete(customerRegistration: CustomerRegistration) {
-        try {
-            keycloakService.removeUser(customerRegistration.customer.username)
-        } catch (e: Exception) {
-            println("Error processing deletion for user ${customerRegistration.customer.username}: ${e.message}")
+    fun listenToCustomerEvents(keycloakCustomerEventDto: KeycloakCustomerEventDto) {
+        when (keycloakCustomerEventDto.eventType) {
+            "CREATE" -> {
+                try {
+                    keycloakService.registerCustomer(keycloakCustomerEventDto.keycloakCustomer)
+                } catch (e: Exception) {
+                    println("Error processing registration for user ${keycloakCustomerEventDto.keycloakCustomer.username}: ${e.message}")
+                }
+            }
+            "UPDATE" -> {
+                try {
+                    keycloakService.updateCustomer(keycloakCustomerEventDto.keycloakCustomer)
+                } catch (e: Exception) {
+                    println("Error processing update for user ${keycloakCustomerEventDto.keycloakCustomer.username}: ${e.message}")
+                }
+            }
+            "DELETE" -> {
+                try {
+                    keycloakService.removeUser(keycloakCustomerEventDto.keycloakCustomer.username)
+                } catch (e: Exception) {
+                    println("Error processing deletion for user ${keycloakCustomerEventDto.keycloakCustomer.username}: ${e.message}")
+                }
+            }
         }
     }
 }

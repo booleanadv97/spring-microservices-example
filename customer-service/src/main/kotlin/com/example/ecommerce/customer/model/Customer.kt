@@ -16,7 +16,7 @@ data class Customer(
     val familyName: String,
 
     @Column(nullable = false)
-    val username: String,
+    var username: String,
 
     @Column(nullable = false, unique = true)
     var email: String,
@@ -26,6 +26,10 @@ data class Customer(
 
     @Embedded
     var address: Address? = null,
+
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name = "customer_id")
+    var shippingAddresses: List<ShippingAddress> = listOf(),
 
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -42,3 +46,14 @@ data class Address(
     val postalCode: String,
     val addressCountry: String
 )
+
+@Entity
+data class ShippingAddress(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val shippingAddressId: Long,
+    val recipientName: String,
+    @Embedded
+    val address: Address,
+)
+

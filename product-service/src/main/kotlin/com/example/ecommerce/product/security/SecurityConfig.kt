@@ -19,6 +19,7 @@ class SecurityConfig {
             .csrf { csrf -> csrf.disable() }
             .cors { }
             .authorizeHttpRequests { authorize ->
+                authorize.requestMatchers("/products/api/login").permitAll()
                 authorize.requestMatchers("/products/api/**").authenticated()
                     .anyRequest().permitAll()
             }

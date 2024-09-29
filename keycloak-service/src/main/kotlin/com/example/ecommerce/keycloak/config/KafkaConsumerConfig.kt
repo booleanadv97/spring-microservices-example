@@ -1,6 +1,6 @@
 package com.example.ecommerce.keycloak.config
 
-import com.example.ecommerce.customer.dto.CustomerRegistration
+import com.example.ecommerce.common.dto.customer.KeycloakCustomerEventDto
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.springframework.beans.factory.annotation.Value
@@ -23,20 +23,32 @@ class KafkaConsumerConfig {
     private lateinit var kafkaConsumerGroupId: String
 
     @Bean
-    fun consumerFactory(): ConsumerFactory<String, CustomerRegistration> {
+    fun customerConsumerFactory(): ConsumerFactory<String, KeycloakCustomerEventDto> {
         val configProps: MutableMap<String, Any> = HashMap()
+
+        // Basic Consumer properties
         configProps[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaBootstrapServers
         configProps[ConsumerConfig.GROUP_ID_CONFIG] = kafkaConsumerGroupId
         configProps[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
         configProps[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JsonDeserializer::class.java
-        configProps[JsonDeserializer.TRUSTED_PACKAGES] = "*"
-        return DefaultKafkaConsumerFactory(configProps)
+
+        // Configuring the JsonDeserializer
+        val jsonDeserializer = JsonDeserializer(KeycloakCustomerEventDto::class.java).apply {
+            addTrustedPackages("com.example.ecommerce.common.dto")
+            setUseTypeMapperForKey(false)
+        }
+
+        return DefaultKafkaConsumerFactory(
+            configProps,
+            StringDeserializer(),
+            jsonDeserializer
+        )
     }
 
     @Bean
-    fun kafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, CustomerRegistration> {
-        val factory = ConcurrentKafkaListenerContainerFactory<String, CustomerRegistration>()
-        factory.consumerFactory = consumerFactory()
+    fun customerKafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, KeycloakCustomerEventDto> {
+        val factory = ConcurrentKafkaListenerContainerFactory<String, KeycloakCustomerEventDto>()
+        factory.consumerFactory = customerConsumerFactory()
         return factory
     }
 }

@@ -1,5 +1,6 @@
 rootProject.name = "ecommerce"
-include("keycloak-service", "cart-service", "eureka-server", "gateway", "customer-service", "product-service", "inventory-service")
+include("keycloak-service", "cart-service", "product-service", "eureka-server", "gateway",
+    "customer-service", "order-service", "inventory-service", "common")
 pluginManagement {
     val kotlinVersion: String by settings
     val springBootVersion: String by settings

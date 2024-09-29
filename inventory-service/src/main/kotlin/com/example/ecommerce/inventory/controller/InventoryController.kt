@@ -2,7 +2,7 @@ package com.example.ecommerce.inventory.controller
 
 import com.example.ecommerce.inventory.dto.StockDto
 import com.example.ecommerce.inventory.model.Stock
-import com.example.ecommerce.inventory.service.InventoryServiceImpl
+import com.example.ecommerce.inventory.service.InventoryService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springframework.http.ResponseEntity
@@ -12,11 +12,20 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/inventory/api")
-class InventoryController(private val inventoryService: InventoryServiceImpl) {
+class InventoryController(private val inventoryService: InventoryService) {
+
+    // Endpoint to login
+    @PostMapping("/login")
+    @Operation(summary = "Login as inventory manager")
+    @ApiResponse(responseCode = "200", description = "Successful login")
+    fun login(@RequestParam username : String, @RequestParam password: String): ResponseEntity<String> {
+        val jwt = inventoryService.login(username, password)
+        return ResponseEntity.ok(jwt)
+    }
 
     // Endpoint to find stock by id
     @GetMapping("/{productId}")
-    @Operation(summary = "Find stock by product id")
+    @Operation(summary = "Find stock by order id")
     @PreAuthorize("hasRole('INVENTORY_MANAGER')")
     @ApiResponse(responseCode = "200", description = "Successful stock retrieval")
     fun getStockByProductId(@PathVariable productId: Long): ResponseEntity<Stock> {

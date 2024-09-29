@@ -12,4 +12,6 @@ dependencies {
     implementation("org.keycloak:keycloak-admin-client:25.0.0")
     implementation("org.springframework.kafka:spring-kafka")
     testImplementation("org.springframework.kafka:spring-kafka-test")
+    implementation(project(":common"))
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 }

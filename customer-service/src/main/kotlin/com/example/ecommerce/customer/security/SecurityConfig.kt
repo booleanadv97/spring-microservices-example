@@ -21,7 +21,8 @@ class SecurityConfig {
             .cors { }
             .authorizeHttpRequests { authorize ->
                 authorize
-                    .requestMatchers("/customers/api/register").permitAll()
+                    .requestMatchers("/customers/api/create").permitAll()
+                    .requestMatchers("/customers/api/login_customer").permitAll()
                     .requestMatchers("/customers/api/**").authenticated()
                     .anyRequest().permitAll()
             }

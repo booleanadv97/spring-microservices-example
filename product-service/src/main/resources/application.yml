@@ -20,7 +20,7 @@ spring:
   datasource:
     product:
       driver-class-name: com.mysql.cj.jdbc.Driver  # JDBC driver class name
-      url: jdbc:mysql://product-db:3307/product_db  # URL of the MySQL database
+      url: jdbc:mysql://order-db:3307/product_db  # URL of the MySQL database
       username: product_db_admin  # Username for the MySQL database
       password: product_db_admin_password  # Password for the MySQL database
 

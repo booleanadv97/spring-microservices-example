@@ -1,7 +1,7 @@
 package com.example.ecommerce.product.controller
 
-import com.example.ecommerce.product.dto.CategoryDto
-import com.example.ecommerce.product.dto.ProductDto
+import com.example.ecommerce.common.dto.product.CategoryDTO
+import com.example.ecommerce.common.dto.product.ProductDTO
 import com.example.ecommerce.product.model.Category
 import com.example.ecommerce.product.model.Product
 import com.example.ecommerce.product.service.ProductService
@@ -20,12 +20,21 @@ class ProductController {
     @Autowired
     private lateinit var productService: ProductService
 
+    // Endpoint to login
+    @PostMapping("/login")
+    @Operation(summary = "Login as product manager")
+    @ApiResponse(responseCode = "200", description = "Successful login")
+    fun login(@RequestParam username : String, @RequestParam password: String): ResponseEntity<String> {
+        val jwt = productService.login(username, password)
+        return ResponseEntity.ok(jwt)
+    }
+
     // Endpoint to create a new product
-    @Operation(summary = "Register a new product")
-    @ApiResponse(responseCode = "200", description = "Successful product registration")
+    @Operation(summary = "Create a new product")
+    @ApiResponse(responseCode = "200", description = "Successful product creation")
     @PreAuthorize("hasRole('PRODUCT_MANAGER')")
-    @PostMapping("/register")
-    fun createProduct(@RequestBody productDto: ProductDto): ResponseEntity<Product> {
+    @PostMapping("/create")
+    fun createProduct(@RequestBody productDto: ProductDTO): ResponseEntity<Product> {
         val newProduct = productService.createProduct(productDto)
         return ResponseEntity.ok(newProduct)
     }
@@ -33,33 +42,32 @@ class ProductController {
     // Endpoint to update an existing product
     @Operation(summary = "Update product")
     @ApiResponse(responseCode = "200", description = "Successful product update")
-    @PutMapping("/{id}")
+    @PutMapping("/{productId}")
     @PreAuthorize("hasRole('PRODUCT_MANAGER')")
     fun updateProduct(
-        @PathVariable id: Long,
-        @RequestBody productDto: ProductDto
+        @RequestBody productDto: ProductDTO
     ): ResponseEntity<Product> {
-        val updatedProduct = productService.updateProduct(id, productDto)
+        val updatedProduct = productService.updateProduct(productDto)
         return ResponseEntity.ok(updatedProduct)
     }
 
-    // Endpoint to delete a product by id
+    // Endpoint to delete a product 
     @Operation(summary = "Delete product")
-    @ApiResponse(responseCode = "200", description = "Successful product deletion")
+    @ApiResponse(responseCode = "200", description = "Successful product removal")
     @PreAuthorize("hasRole('PRODUCT_MANAGER')")
-    @DeleteMapping("/{id}")
-    fun deleteProduct(@PathVariable id: Long): ResponseEntity<Void> {
-        productService.deleteProduct(id)
+    @DeleteMapping("/{productId}")
+    fun deleteProduct(@PathVariable productId: Long): ResponseEntity<Void> {
+        productService.deleteProduct(productId)
         return ResponseEntity.ok(null)
     }
 
-    // Endpoint to get a product by id
+    // Endpoint to find a product
     @Operation(summary = "Find product")
     @ApiResponse(responseCode = "200", description = "Successful product retrieval")
     @PreAuthorize("hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
-    @GetMapping("/{id}")
-    fun getProductById(@PathVariable id: Long): ResponseEntity<Product> {
-        val product = productService.getProductById(id)
+    @GetMapping("/{productId}")
+    fun getProductById(@PathVariable productId: Long): ResponseEntity<ProductDTO> {
+        val product = productService.getProductById(productId)
         return ResponseEntity.ok(product)
     }
 
@@ -68,37 +76,37 @@ class ProductController {
     @ApiResponse(responseCode = "200", description = "Successful categories retrieval")
     @PreAuthorize("hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
     @GetMapping("/categories")
-    fun getCategories(): ResponseEntity<List<Category>> {
+    fun getCategories(): ResponseEntity<List<CategoryDTO>> {
         val categories = productService.getCategories()
         return ResponseEntity.ok(categories)
     }
 
-    // Endpoint to create a new product
+    // Endpoint to create a new category
     @Operation(summary = "Register a new category")
     @PreAuthorize("hasRole('PRODUCT_MANAGER')")
     @ApiResponse(responseCode = "200", description = "Successful category creation")
     @PostMapping("/registerCategory")
-    fun createCategory(@RequestBody categoryDto: CategoryDto): ResponseEntity<Category> {
+    fun createCategory(@RequestBody categoryDto: CategoryDTO): ResponseEntity<Category> {
         val newCategory = productService.createCategory(categoryDto)
         return ResponseEntity.ok(newCategory)
     }
 
-    // Endpoint to get a product by name (example of a custom query)
+    // Endpoint to get a product by name
     @Operation(summary = "Get product by name")
     @PreAuthorize("hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
     @ApiResponse(responseCode = "200", description = "Successful product retrieval")
-    @GetMapping("/byname/{name}")
-    fun getProductByName(@PathVariable name: String): ResponseEntity<Product?> {
+    @GetMapping("/byName/{name}")
+    fun getProductByName(@PathVariable name: String): ResponseEntity<ProductDTO?> {
         val product = productService.getProductByName(name)
         return ResponseEntity.ok(product)
     }
 
     // Endpoint to get all products
     @Operation(summary = "Get all products")
-    @ApiResponse(responseCode = "200", description = "Successful retrieval of products")
+    @ApiResponse(responseCode = "200", description = "Successful retrieval of all products")
     @PreAuthorize("hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
     @GetMapping("/")
-    fun getAllStocks(authentication: JwtAuthenticationToken): ResponseEntity<List<Product>> {
+    fun getAllProducts(authentication: JwtAuthenticationToken): ResponseEntity<List<Product>> {
         val products = productService.getAllProducts()
         return ResponseEntity.ok(products)
     }
