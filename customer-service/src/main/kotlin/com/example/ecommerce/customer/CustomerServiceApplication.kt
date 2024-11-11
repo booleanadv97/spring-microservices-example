@@ -7,7 +7,6 @@ import org.springframework.context.annotation.ComponentScan
 
 @SpringBootApplication
 @EnableFeignClients
-@ComponentScan(basePackages = ["com.example.ecommerce.common", "com.example.ecommerce.customer"])
 class CustomerServiceApplication
 
 fun main(args: Array<String>) {

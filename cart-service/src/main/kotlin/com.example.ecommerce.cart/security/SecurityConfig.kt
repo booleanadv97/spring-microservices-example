@@ -20,7 +20,7 @@ class SecurityConfig {
             .cors { }
             .authorizeHttpRequests { authorize ->
                 authorize
-                    .requestMatchers("/cart/api/**").authenticated()
+                    .requestMatchers("/cart/api/v1/**").authenticated()
                     .anyRequest().permitAll()
             }
             .oauth2ResourceServer { oauth2 ->

@@ -1,6 +1,6 @@
 package com.example.ecommerce.keycloak.config
 
-import com.example.ecommerce.common.dto.customer.KeycloakCustomerEventDto
+import com.example.ecommerce.keycloak.dto.customer.KeycloakCustomerEventDto
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.springframework.beans.factory.annotation.Value

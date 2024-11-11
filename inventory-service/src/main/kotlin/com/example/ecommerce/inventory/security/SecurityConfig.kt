@@ -20,9 +20,8 @@ class SecurityConfig {
             .csrf { csrf -> csrf.disable() }
             .cors { }
             .authorizeHttpRequests { authorize ->
-                authorize.requestMatchers("/inventory/api/login").permitAll()
-                authorize.requestMatchers("/inventory/api/register").permitAll()
-                authorize.requestMatchers("/inventory/api/**").authenticated()
+                authorize.requestMatchers("/inventory/api/v1/login").permitAll()
+                authorize.requestMatchers("/inventory/api/v1/**").authenticated()
                     .anyRequest().permitAll()
             }
             .oauth2ResourceServer { oauth2 ->

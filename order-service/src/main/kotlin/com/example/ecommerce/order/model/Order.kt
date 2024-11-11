@@ -1,9 +1,7 @@
 package com.example.ecommerce.order.model
 
-import com.example.ecommerce.common.dto.cart.CartItem
-import com.example.ecommerce.common.dto.customer.ShippingAddressDTO
-import com.example.ecommerce.common.dto.order.OrderStatusEnum
-import com.example.ecommerce.common.dto.order.ShipmentStatusEnum
+import com.example.ecommerce.order.dto.cart.CartItem
+import com.example.ecommerce.order.dto.customer.ShippingAddressDTO
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -13,8 +11,8 @@ data class Order(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     @Column(nullable = false)
-    val userId: Long,
-    @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    val customerId: Long,
+    @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true)
     val items: MutableList<OrderItem> = mutableListOf(),
     @Embedded @Column(nullable = false)
     val shippingAddress: ShippingAddressDTO,
@@ -35,7 +33,23 @@ data class OrderItem(
     val cartItem: CartItem,
 )
 
+enum class OrderStatusEnum {
+    PENDING,
+    PROCESSING,
+    SHIPPED,
+    DELIVERED,
+    DECLINED,
+    REFUNDED,
+    CANCELLED
+}
 
-
+enum class ShipmentStatusEnum {
+    DISPATCHED,
+    IN_TRANSIT,
+    OUT_FOR_DELIVERY,
+    DELIVERED,
+    DELAYED,
+    LOST,
+}
 
 

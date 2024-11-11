@@ -1,16 +1,16 @@
 package com.example.ecommerce.order.service
 
-import com.example.ecommerce.common.dto.cart.CartEvent
-import com.example.ecommerce.common.dto.order.OrderStatusEnum
+import com.example.ecommerce.order.dto.cart.CartEvent
 import com.example.ecommerce.order.model.Order
+import com.example.ecommerce.order.model.OrderStatusEnum
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 
 interface OrderService {
-    fun createOrder(cartEvent: CartEvent): Order?
-    fun findOrderById(orderId: Long): Order?
-    fun findOrderByUserId(userId: Long): Order?
-    fun updateOrderStatus(orderId: Long, status: OrderStatusEnum): Order?
-    fun deleteOrder(orderId: Long)
+    fun create(cartEvent: CartEvent): Order?
+    fun find(orderId: Long): Order?
+    fun findAll(): List<Order>
+    fun findOrders(customerId: Long): List<Order>?
+    fun update(orderId: Long, status: OrderStatusEnum): Order?
+    fun delete(orderId: Long)
     fun checkOrderAuth(authentication: JwtAuthenticationToken, customerId: Long): Boolean
-    fun login(username: String, password: String): String?
 }

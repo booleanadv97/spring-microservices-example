@@ -1,6 +1,5 @@
 package com.example.ecommerce.inventory.controller
 
-import com.example.ecommerce.inventory.dto.StockDto
 import com.example.ecommerce.inventory.model.Stock
 import com.example.ecommerce.inventory.service.InventoryService
 import io.swagger.v3.oas.annotations.Operation
@@ -11,72 +10,53 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/inventory/api")
+@RequestMapping("/inventory/api/v1")
 class InventoryController(private val inventoryService: InventoryService) {
 
-    // Endpoint to login
-    @PostMapping("/login")
-    @Operation(summary = "Login as inventory manager")
-    @ApiResponse(responseCode = "200", description = "Successful login")
-    fun login(@RequestParam username : String, @RequestParam password: String): ResponseEntity<String> {
-        val jwt = inventoryService.login(username, password)
-        return ResponseEntity.ok(jwt)
-    }
-
-    // Endpoint to find stock by id
+    // Endpoint to find stock by product id
     @GetMapping("/{productId}")
-    @Operation(summary = "Find stock by order id")
+    @Operation(summary = "Find stock by product id")
     @PreAuthorize("hasRole('INVENTORY_MANAGER')")
     @ApiResponse(responseCode = "200", description = "Successful stock retrieval")
-    fun getStockByProductId(@PathVariable productId: Long): ResponseEntity<Stock> {
-        val stock = inventoryService.getStockByProductId(productId)
+    @ApiResponse(responseCode = "401", description = "Not authenticated or authorized to perform this action")
+    @ApiResponse(responseCode = "404", description = "Stock for product with given id not found")
+    fun find(@PathVariable productId: Long): ResponseEntity<Stock> {
+        val stock = inventoryService.find(productId)
         return ResponseEntity.ok(stock)
     }
 
     // Endpoint to update stock
     @Operation(summary = "Update stock")
-    @ApiResponse(responseCode = "200", description = "Successful update")
+    @ApiResponse(responseCode = "200", description = "Successful stock availability retrieval")
+    @ApiResponse(responseCode = "401", description = "Not authenticated or authorized to perform this action")
+    @ApiResponse(responseCode = "404", description = "Stock for product with given id not found")
+    @ApiResponse(responseCode = "409", description = "Invalid quantity")
     @PreAuthorize("hasRole('INVENTORY_MANAGER')")
     @PutMapping("/{productId}")
-    fun updateStock(@PathVariable productId: Long, @RequestBody quantity: Int): ResponseEntity<Stock> {
-        val updatedStock = inventoryService.updateStock(productId, quantity)
+    fun update(@PathVariable productId: Long, @RequestBody quantity: Int): ResponseEntity<Stock> {
+        val updatedStock = inventoryService.update(productId, quantity)
         return ResponseEntity.ok(updatedStock)
     }
 
-    // Endpoint to add a new stock
-    @Operation(summary = "Add stock")
-    @ApiResponse(responseCode = "200", description = "Successful stock add")
-    @PreAuthorize("hasRole('INVENTORY_MANAGER')")
-    @PostMapping("/register")
-    fun addStock( @RequestBody stockDto: StockDto): ResponseEntity<Stock> {
-        val newStock = inventoryService.addStock(stockDto)
-        return ResponseEntity.ok(newStock)
-    }
-
-    @GetMapping("/check/{productId}")
+    @PostMapping("/availability/{productId}")
     @PreAuthorize("hasRole('INVENTORY_MANAGER') or hasRole('CUSTOMER')")
-    fun checkAvailability( @PathVariable productId: Long, @RequestParam quantity: Int): ResponseEntity<Boolean> {
+    @ApiResponse(responseCode = "200", description = "Successful stock availability retrieval")
+    @ApiResponse(responseCode = "401", description = "Not authenticated or authorized to perform this action")
+    @ApiResponse(responseCode = "404", description = "Stock for product with given id not found")
+    @ApiResponse(responseCode = "409", description = "Invalid quantity")
+    fun checkProductAvailability( @PathVariable productId: Long, @RequestBody quantity: Int): ResponseEntity<Boolean> {
         val isAvailable = inventoryService.checkAvailability(productId, quantity)
         return ResponseEntity.ok(isAvailable)
     }
 
-    // Endpoint to delete stock
-    @Operation(summary = "Delete stock")
-    @ApiResponse(responseCode = "200", description = "Successful stock deletion")
-    @PreAuthorize("hasRole('INVENTORY_MANAGER')")
-    @DeleteMapping("/{productId}")
-    fun deleteStock(@PathVariable productId: Long): ResponseEntity<Void> {
-        inventoryService.deleteStock(productId)
-        return ResponseEntity.ok(null)
-    }
-
-    // Endpoint to get all stocks
+    // Endpoint to find all stocks
     @Operation(summary = "Get all stocks")
     @ApiResponse(responseCode = "200", description = "Successful retrieval of stocks")
+    @ApiResponse(responseCode = "401", description = "Not authenticated or authorized to perform this action")
     @PreAuthorize("hasRole('INVENTORY_MANAGER')")
     @GetMapping("/")
-    fun getAllStocks(authentication: JwtAuthenticationToken): ResponseEntity<List<Stock>> {
-        val stocks = inventoryService.getAllStocks()
+    fun findAll(authentication: JwtAuthenticationToken): ResponseEntity<List<Stock>?> {
+        val stocks = inventoryService.findAll()
         return ResponseEntity.ok(stocks)
     }
 }

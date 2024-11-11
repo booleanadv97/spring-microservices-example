@@ -1,7 +1,6 @@
 package com.example.ecommerce.order.config
 
-import com.example.ecommerce.common.dto.cart.CartEvent
-import com.example.ecommerce.common.dto.customer.KeycloakCustomerEventDto
+import com.example.ecommerce.order.dto.cart.CartEvent
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.springframework.beans.factory.annotation.Value
@@ -25,22 +24,11 @@ class KafkaConsumerConfig {
 
     @Bean
     fun cartConsumerFactory(): ConsumerFactory<String, CartEvent> {
-        val configProps: MutableMap<String, Any> = HashMap()
-
-        // Basic consumer properties
-        configProps[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaBootstrapServers
-        configProps[ConsumerConfig.GROUP_ID_CONFIG] = kafkaConsumerGroupId
-        configProps[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java.name
-        configProps[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JsonDeserializer::class.java.name
-        val jsonDeserializer = JsonDeserializer(CartEvent::class.java).apply {
-            addTrustedPackages("com.example.ecommerce.common.dto")
-            setUseTypeMapperForKey(false)
+        val deserializer = JsonDeserializer(CartEvent::class.java).apply {
+            addTrustedPackages("*")
+            ignoreTypeHeaders()
         }
-        return DefaultKafkaConsumerFactory(
-            configProps,
-            StringDeserializer(),
-            jsonDeserializer
-        )
+        return DefaultKafkaConsumerFactory(configProps(), StringDeserializer(), deserializer)
     }
 
     @Bean
@@ -48,5 +36,13 @@ class KafkaConsumerConfig {
         val factory = ConcurrentKafkaListenerContainerFactory<String, CartEvent>()
         factory.consumerFactory = cartConsumerFactory()
         return factory
+    }
+
+    fun configProps(): MutableMap<String, Any> {
+        val configProps: MutableMap<String, Any> = HashMap()
+        configProps[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaBootstrapServers
+        configProps[ConsumerConfig.GROUP_ID_CONFIG] = kafkaConsumerGroupId
+        configProps[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
+        return configProps
     }
 }

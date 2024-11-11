@@ -1,15 +1,15 @@
 package com.example.ecommerce.cart.client
 
 import org.springframework.cloud.openfeign.FeignClient
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 
 @FeignClient(name = "inventory-service")
 interface InventoryClient {
-    @GetMapping("/inventory/api/check/{productId}")
+    @PostMapping("/inventory/api/v1/availability/{productId}")
     fun checkAvailability(
         @PathVariable("productId") productId: Long?,
-        @RequestParam("quantity") quantity: Int
+        @RequestBody quantity: Int
     ): Boolean?
 }

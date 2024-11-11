@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface CartRepository : JpaRepository<Cart, Long>, QuerydslPredicateExecutor<Cart> {
-    fun findByUserId(userId: Long): Cart?
+    fun findByCustomerId(customerId: Long): Cart?
 }
 

@@ -19,8 +19,8 @@ class SecurityConfig {
             .csrf { csrf -> csrf.disable() }
             .cors { }
             .authorizeHttpRequests { authorize ->
-                authorize.requestMatchers("/products/api/login").permitAll()
-                authorize.requestMatchers("/products/api/**").authenticated()
+                authorize.requestMatchers("/products/api/v1/login").permitAll()
+                authorize.requestMatchers("/products/api/v1/**").authenticated()
                     .anyRequest().permitAll()
             }
             .oauth2ResourceServer { oauth2 ->

@@ -1,7 +1,10 @@
 package com.example.ecommerce.keycloak.service
 
-import com.example.ecommerce.common.dto.customer.KeycloakCustomerDTO
+import com.example.ecommerce.keycloak.dto.customer.KeycloakCustomerDTO
+import com.example.ecommerce.keycloak.exception.UnauthorizedException
 import jakarta.ws.rs.NotFoundException
+import jakarta.ws.rs.WebApplicationException
+import jakarta.ws.rs.core.Response
 import org.keycloak.OAuth2Constants
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.admin.client.KeycloakBuilder
@@ -12,7 +15,6 @@ import org.keycloak.representations.idm.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
-
 
 @Service
 class KeycloakServiceImpl(private val keycloak: Keycloak) : KeycloakService {
@@ -30,11 +32,8 @@ class KeycloakServiceImpl(private val keycloak: Keycloak) : KeycloakService {
 
     // Keycloak Clients
     private val clients = mapOf(
-        "product_client" to Pair(System.getenv("PRODUCT_SERVICE_CLIENT_ID"), System.getenv("PRODUCT_SERVICE_CLIENT_SECRET")),
-        "inventory_client" to Pair(System.getenv("INVENTORY_SERVICE_CLIENT_ID"), System.getenv("INVENTORY_SERVICE_CLIENT_SECRET")),
-        "customer_client" to Pair(System.getenv("CUSTOMER_SERVICE_CLIENT_ID"), System.getenv("CUSTOMER_SERVICE_CLIENT_SECRET")),
-        "order_client" to Pair(System.getenv("ORDER_SERVICE_CLIENT_ID"), System.getenv("ORDER_SERVICE_CLIENT_SECRET")),
-        )
+        "ecommerce_client" to Pair(System.getenv("ECOMMERCE_CLIENT_ID"), System.getenv("ECOMMERCE_CLIENT_SECRET")),
+    )
 
     // Keycloak Roles
     private val roles = mapOf( "customer_role" to "CUSTOMER",
@@ -46,6 +45,7 @@ class KeycloakServiceImpl(private val keycloak: Keycloak) : KeycloakService {
 
     override fun createRealmAndConfigs(){
         createRealmIfNotExists()
+        configureRealmLoginSettings()
         createClientsIfNotExists()
         createRolesIfNotExists()
         createDefaultUsers()
@@ -58,6 +58,21 @@ class KeycloakServiceImpl(private val keycloak: Keycloak) : KeycloakService {
             realm.isEnabled = true
             keycloak.realms().create(realm)
             println("[Keycloak Initializer]: Realm $realmName created!")
+        }
+    }
+
+    private fun configureRealmLoginSettings() {
+        val realmResource = keycloak.realm(realmName)
+        val realmRepresentation = realmResource.toRepresentation()
+        // Check current settings
+        val isEditUsernameAllowed = realmRepresentation.isEditUsernameAllowed
+        // Update settings if needed
+        if (!isEditUsernameAllowed) {
+            realmRepresentation.isEditUsernameAllowed = true
+            println("Updating realm login settings to allow username editing.")
+            // Persist the updated settings
+            realmResource.update(realmRepresentation)
+            println("Realm login settings updated.")
         }
     }
 
@@ -149,33 +164,28 @@ class KeycloakServiceImpl(private val keycloak: Keycloak) : KeycloakService {
         return createUser(username, familyName, givenName, password, email, roles["order_manager_role"]!!)
     }
 
-    fun login(username: String, password: String, clientId: String, clientSecret: String): String? {
-        try {
-            // Create a Keycloak instance to perform the Direct Access Grant (login)
+    override fun login(username: String, password: String): String {
+         try {
             val keycloakLogin: Keycloak = KeycloakBuilder.builder()
                 .serverUrl(authUrl)
                 .realm(realmName)
-                .clientId(clientId)
-                .clientSecret(clientSecret)
+                .clientId(clients["ecommerce_client"]!!.first)
+                .clientSecret(clients["ecommerce_client"]!!.second)
                 .grantType(OAuth2Constants.PASSWORD)
                 .username(username)
                 .password(password)
                 .build()
-
-            // Use the Keycloak object to retrieve the access token
             val accessTokenResponse: AccessTokenResponse = keycloakLogin.tokenManager().accessToken
-
-            // Return the access token (or use it in subsequent requests)
             return accessTokenResponse.token
-
-        } catch (ex: Exception) {
-            // Handle error (e.g., invalid credentials)
-            throw RuntimeException("Login failed for user $username: ${ex.message}")
+        }catch (e: WebApplicationException) {
+            if (e.response.status == Response.Status.UNAUTHORIZED.statusCode) {
+                throw UnauthorizedException("Invalid credentials provided: ${e.response.readEntity(String::class.java)}")
+            } else {
+                throw RuntimeException("Failed to authenticate: ${e.message}")
+            }
+        } catch (e: Exception) {
+            throw RuntimeException("An unexpected error occurred: ${e.message}")
         }
-    }
-
-    override fun loginCustomer(username: String, password: String): String? {
-        return clients["customer_client"]?.let { login(username, password, it.first, it.second) }
     }
 
     @Transactional
@@ -194,6 +204,10 @@ class KeycloakServiceImpl(private val keycloak: Keycloak) : KeycloakService {
         val existingUser = usersResource[userId].toRepresentation()
 
         // Update fields
+        if(keycloakCustomer.updatedUsername != null)
+            existingUser.username = keycloakCustomer.updatedUsername
+        else
+            existingUser.username = keycloakCustomer.username
         existingUser.email = keycloakCustomer.email
         existingUser.credentials = listOf(CredentialRepresentation().apply {
             type = CredentialRepresentation.PASSWORD
@@ -213,17 +227,5 @@ class KeycloakServiceImpl(private val keycloak: Keycloak) : KeycloakService {
             return users[0].id // Assuming username is unique
         }
         throw NotFoundException("User not found")
-    }
-
-    override fun loginProduct(username: String, password: String): String? {
-        return clients["product_client"]?.let { login(username, password, it.first , it.second) }
-    }
-
-    override fun loginInventory(username: String, password: String): String? {
-        return clients["inventory_client"]?.let { login(username, password, it.first , it.second) }
-    }
-
-    override fun loginOrder(username: String, password: String): String? {
-        return clients["order_client"]?.let { login(username, password, it.first , it.second) }
     }
 }

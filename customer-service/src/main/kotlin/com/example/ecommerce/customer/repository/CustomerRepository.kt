@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface CustomerRepository : JpaRepository<Customer, Long>, QuerydslPredicateExecutor<Customer> {
-    fun findByEmail(email: String): Customer?
     fun findByUsername(username: String): Customer?
 }
 

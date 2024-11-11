@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface OrderRepository : JpaRepository<Order, Long>, QuerydslPredicateExecutor<Order> {
-    fun findByUserId(userId: Long): Order?
+    fun findByCustomerId(customerId: Long): List<Order>?
 }

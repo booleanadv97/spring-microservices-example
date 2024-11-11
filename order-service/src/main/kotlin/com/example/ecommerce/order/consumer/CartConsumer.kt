@@ -1,6 +1,6 @@
 package com.example.ecommerce.order.consumer
 
-import com.example.ecommerce.common.dto.cart.CartEvent
+import com.example.ecommerce.order.dto.cart.CartEvent
 import com.example.ecommerce.order.service.OrderService
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
@@ -13,7 +13,7 @@ class CartConsumer (private val orderService: OrderService){
         containerFactory = "cartKafkaListenerContainerFactory"
     )
     fun consume(cartEvent: CartEvent) {
-        val order = orderService.createOrder(cartEvent)
-        println(order?.id)
+        if(cartEvent.eventType == "CHECKOUT")
+            orderService.create(cartEvent)
     }
 }

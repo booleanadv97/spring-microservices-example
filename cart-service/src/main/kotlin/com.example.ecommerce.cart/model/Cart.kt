@@ -1,6 +1,6 @@
 package com.example.ecommerce.cart.model
 
-import com.example.ecommerce.common.dto.product.ProductDTO
+import com.example.ecommerce.cart.dto.product.ProductDTO
 import jakarta.persistence.*
 import jakarta.persistence.GenerationType.IDENTITY
 
@@ -8,8 +8,8 @@ import jakarta.persistence.GenerationType.IDENTITY
 @Table(name = "carts")
 data class Cart(
     @Id @GeneratedValue(strategy = IDENTITY) val id: Long? = null,
-    val userId: Long,
-    @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER) val items: MutableList<CartItem> = mutableListOf()
+    val customerId: Long,
+    @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true) val items: MutableList<CartItem> = mutableListOf()
 )
 
 @Entity

@@ -10,7 +10,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/cart/api")
+@RequestMapping("/cart/api/v1")
 class CartController {
 
     @Autowired
@@ -19,76 +19,77 @@ class CartController {
     // Endpoint to create a new cart
     @Operation(summary = "Creates a new cart")
     @ApiResponse(responseCode = "200", description = "Cart created successfully")
+    @ApiResponse(responseCode = "401", description = "Not authenticated or authorized to perform this action")
+    @ApiResponse(responseCode = "409", description = "Cart already exists for customer with given id")
     // Create a new cart for the user
-    @PostMapping("/{userId}/create")
-    fun createCart(authenticationToken: JwtAuthenticationToken, @PathVariable userId: Long): ResponseEntity<Cart> {
-        if(!cartService.checkCartAuth(authenticationToken, userId))
-            throw RuntimeException("You are not authorized to perform this operation")
-        val newCart = cartService.createCart(userId)
+    @PostMapping("/{customerId}")
+    fun create(authenticationToken: JwtAuthenticationToken, @PathVariable customerId: Long): ResponseEntity<Cart> {
+        val newCart = cartService.create(authenticationToken, customerId)
         return ResponseEntity.ok(newCart)
     }
 
     // Endpoint to add a new item to the cart
     @Operation(summary = "Add item to the cart")
     @ApiResponse(responseCode = "200", description = "Item added successfully")
-    @PostMapping("/{userId}/items")
-    fun addItemToCart(
+    @ApiResponse(responseCode = "401", description = "Not authenticated or authorized to perform this action")
+    @ApiResponse(responseCode = "404", description = "Cart or product not found")
+    @ApiResponse(responseCode = "409", description = "Invalid quantity")
+    @PostMapping("/{customerId}/items")
+    fun addItem(
         authenticationToken: JwtAuthenticationToken,
-        @PathVariable userId: Long,
+        @PathVariable customerId: Long,
         @RequestParam productId: Long,
         @RequestParam quantity: Int,
     ): ResponseEntity<Cart> {
-        if(!cartService.checkCartAuth(authenticationToken, userId))
-            throw RuntimeException("You are not authorized to perform this operation")
-        val updatedCart = cartService.addItemToCart(userId, productId, quantity)
+        val updatedCart = cartService.addItem(authenticationToken, customerId, productId, quantity)
         return ResponseEntity.ok(updatedCart)
     }
 
     // Endpoint to remove item from the cart
     @Operation(summary = "Removes item from cart")
     @ApiResponse(responseCode = "200", description = "Item removed successfully")
-    @DeleteMapping("/{userId}/clearItem")
-    fun removeItemFromCart(
+    @ApiResponse(responseCode = "401", description = "Not authenticated or authorized to perform this action")
+    @ApiResponse(responseCode = "404", description = "Cart not found or product not present in the cart")
+    @DeleteMapping("/{customerId}/items/{productId}")
+    fun removeItem(
         authenticationToken: JwtAuthenticationToken,
-        @PathVariable userId: Long,
-        @RequestParam productId: Long,
+        @PathVariable customerId: Long,
+        @PathVariable productId: Long,
     ): ResponseEntity<Cart> {
-        if(!cartService.checkCartAuth(authenticationToken, userId))
-            throw RuntimeException("You are not authorized to perform this operation")
-        val updatedCart = cartService.removeItemFromCart(userId, productId)
+        val updatedCart = cartService.removeItem(authenticationToken, customerId, productId)
         return ResponseEntity.ok(updatedCart)
     }
 
     // Endpoint to get the cart of a specific user
     @Operation(summary = "Get cart of a specific user")
     @ApiResponse(responseCode = "200", description = "Cart retrieved successfully")
-    @GetMapping("/{userId}")
-    fun viewCart(authenticationToken: JwtAuthenticationToken, @PathVariable userId: Long): ResponseEntity<Cart> {
-        if(!cartService.checkCartAuth(authenticationToken, userId))
-            throw RuntimeException("You are not authorized to perform this operation")
-        val cart = cartService.getCartByUserId(userId) ?: return ResponseEntity.notFound().build()
+    @ApiResponse(responseCode = "401", description = "Not authenticated or authorized to perform this action")
+    @ApiResponse(responseCode = "404", description = "Cart not found for customer with given id")
+    @GetMapping("/{customerId}")
+    fun find(authenticationToken: JwtAuthenticationToken, @PathVariable customerId: Long): ResponseEntity<Cart> {
+        val cart = cartService.find(authenticationToken, customerId)
         return ResponseEntity.ok(cart)
     }
 
-    // Endpoint to delete the  cart of a specific user
-    @Operation(summary = "Delete cart of a specific user")
-    @ApiResponse(responseCode = "200", description = "Cart deleted successfully")
-    @DeleteMapping("/{userId}/clear")
-    fun clearCart(authenticationToken: JwtAuthenticationToken, @PathVariable userId: Long): ResponseEntity<String> {
-        if(!cartService.checkCartAuth(authenticationToken, userId))
-            throw RuntimeException("You are not authorized to perform this operation")
-        val result = cartService.clearCart(userId)
+    // Endpoint to empty the cart of a specific user
+    @Operation(summary = "Empty cart of a specific user")
+    @ApiResponse(responseCode = "200", description = "Cart emptied successfully")
+    @ApiResponse(responseCode = "401", description = "Not authenticated or authorized to perform this action")
+    @ApiResponse(responseCode = "404", description = "Cart not found for customer with given id")
+    @DeleteMapping("/{customerId}/items")
+    fun clear(authenticationToken: JwtAuthenticationToken, @PathVariable customerId: Long): ResponseEntity<String> {
+        val result = cartService.clear(authenticationToken, customerId)
         return ResponseEntity.ok(result)
     }
 
     // Cart checkout endpoint
     @Operation(summary = "Cart checkout")
     @ApiResponse(responseCode = "200", description = "Checkout successfully")
-    @PostMapping("/{userId}/checkout")
-    fun checkoutCart(authenticationToken: JwtAuthenticationToken, @PathVariable userId: Long, @RequestParam shippingAddressId: Long): ResponseEntity<String> {
-        if(!cartService.checkCartAuth(authenticationToken, userId))
-            throw RuntimeException("You are not authorized to perform this operation")
-        val result = cartService.checkoutCart(userId, shippingAddressId)
+    @ApiResponse(responseCode = "401", description = "Not authenticated or authorized to perform this action")
+    @ApiResponse(responseCode = "404", description = "Cart or shipping address not found for customer with given id")
+    @PostMapping("/{customerId}/checkout")
+    fun checkout(authenticationToken: JwtAuthenticationToken, @PathVariable customerId: Long, @RequestParam shippingAddressId: Long): ResponseEntity<String> {
+        val result = cartService.checkout(authenticationToken, customerId, shippingAddressId)
         return ResponseEntity.ok(result)
     }
 }

@@ -9,3 +9,17 @@ import org.springframework.stereotype.Repository
 interface ProductRepository : JpaRepository<Product, Long>, QuerydslPredicateExecutor<Product> {
     fun findByName(name: String): Product?
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

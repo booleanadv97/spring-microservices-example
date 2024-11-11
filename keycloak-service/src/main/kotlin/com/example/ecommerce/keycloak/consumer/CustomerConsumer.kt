@@ -1,6 +1,6 @@
 package com.example.ecommerce.keycloak.consumer
 
-import com.example.ecommerce.common.dto.customer.KeycloakCustomerEventDto
+import com.example.ecommerce.keycloak.dto.customer.KeycloakCustomerEventDto
 import com.example.ecommerce.keycloak.service.KeycloakService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.annotation.KafkaListener
@@ -26,14 +26,14 @@ class CustomerConsumer(@Autowired val keycloakService: KeycloakService) {
                 try {
                     keycloakService.updateCustomer(keycloakCustomerEventDto.keycloakCustomer)
                 } catch (e: Exception) {
-                    println("Error processing update for user ${keycloakCustomerEventDto.keycloakCustomer.username}: ${e.message}")
+                    println("Error processing update of user ${keycloakCustomerEventDto.keycloakCustomer.username}: ${e.message}")
                 }
             }
             "DELETE" -> {
                 try {
                     keycloakService.removeUser(keycloakCustomerEventDto.keycloakCustomer.username)
                 } catch (e: Exception) {
-                    println("Error processing deletion for user ${keycloakCustomerEventDto.keycloakCustomer.username}: ${e.message}")
+                    println("Error processing deletion of user ${keycloakCustomerEventDto.keycloakCustomer.username}: ${e.message}")
                 }
             }
         }

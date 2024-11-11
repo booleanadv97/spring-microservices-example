@@ -8,7 +8,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.web.SecurityFilterChain
 
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
@@ -21,9 +20,9 @@ class SecurityConfig {
             .cors { }
             .authorizeHttpRequests { authorize ->
                 authorize
-                    .requestMatchers("/customers/api/create").permitAll()
-                    .requestMatchers("/customers/api/login_customer").permitAll()
-                    .requestMatchers("/customers/api/**").authenticated()
+                    .requestMatchers("/customers/api/v1/create").permitAll()
+                    .requestMatchers("/customers/api/v1/login").permitAll()
+                    .requestMatchers("/customers/api/v1/**").authenticated()
                     .anyRequest().permitAll()
             }
             .oauth2ResourceServer { oauth2 ->

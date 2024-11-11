@@ -28,8 +28,7 @@ data class Customer(
     var address: Address? = null,
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "customer_id")
-    var shippingAddresses: List<ShippingAddress> = listOf(),
+    var shippingAddresses: MutableList<ShippingAddress> = mutableListOf(),
 
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -52,8 +51,8 @@ data class ShippingAddress(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val shippingAddressId: Long,
-    val recipientName: String,
+    var recipientName: String,
     @Embedded
-    val address: Address,
+    var address: Address,
 )
 

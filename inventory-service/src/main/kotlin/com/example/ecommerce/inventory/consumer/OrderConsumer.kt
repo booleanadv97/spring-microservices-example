@@ -1,8 +1,6 @@
 package com.example.ecommerce.inventory.consumer
 
-import com.example.ecommerce.common.dto.order.OrderEvent
-import com.example.ecommerce.common.dto.product.ProductEventDTO
-import com.example.ecommerce.inventory.dto.StockDto
+import com.example.ecommerce.inventory.dto.order.OrderEvent
 import com.example.ecommerce.inventory.service.InventoryService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.annotation.KafkaListener

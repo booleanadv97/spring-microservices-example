@@ -1,6 +1,4 @@
 services:
-  # Database Services
-
   # Cart service database
   cart-db:
     image: mysql:8.0
@@ -254,14 +252,8 @@ services:
       KEYCLOAK_SERVER_URL: http://keycloak:8080
       KEYCLOAK_ADMIN_PASSWORD: admin
       KEYCLOAK_ADMIN: admin
-      PRODUCT_SERVICE_CLIENT_ID: product-service-client
-      PRODUCT_SERVICE_CLIENT_SECRET: product-service-client-secret
-      CUSTOMER_SERVICE_CLIENT_ID: customer-service-client
-      CUSTOMER_SERVICE_CLIENT_SECRET: customer-service-client-secret
-      INVENTORY_SERVICE_CLIENT_ID: inventory-service-client
-      INVENTORY_SERVICE_CLIENT_SECRET: inventory-service-client-secret
-      ORDER_SERVICE_CLIENT_ID: order-service-client
-      ORDER_SERVICE_CLIENT_SECRET: order-service-client-secret
+      ECOMMERCE_CLIENT_ID: ecommerce-client
+      ECOMMERCE_CLIENT_SECRET: ecommerce-client-secret
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
     depends_on:

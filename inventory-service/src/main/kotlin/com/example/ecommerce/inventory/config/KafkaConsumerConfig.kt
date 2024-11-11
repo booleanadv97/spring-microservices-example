@@ -1,7 +1,7 @@
 package com.example.ecommerce.inventory.config
 
-import com.example.ecommerce.common.dto.order.OrderEvent
-import com.example.ecommerce.common.dto.product.ProductEventDTO
+import com.example.ecommerce.inventory.dto.order.OrderEvent
+import com.example.ecommerce.inventory.dto.product.ProductEventDTO
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.springframework.beans.factory.annotation.Value
@@ -23,15 +23,14 @@ class KafkaConsumerConfig {
     @Value("\${spring.kafka.consumer.group-id}")
     private lateinit var kafkaConsumerGroupId: String
 
+    // Product Consumer Factory
     @Bean
     fun productConsumerFactory(): ConsumerFactory<String, ProductEventDTO> {
-        val configProps: MutableMap<String, Any> = HashMap()
-        configProps[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaBootstrapServers
-        configProps[ConsumerConfig.GROUP_ID_CONFIG] = kafkaConsumerGroupId
-        configProps[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
-        configProps[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JsonDeserializer::class.java
-        configProps[JsonDeserializer.TRUSTED_PACKAGES] = "*"
-        return DefaultKafkaConsumerFactory(configProps)
+        val deserializer = JsonDeserializer(ProductEventDTO::class.java).apply {
+            addTrustedPackages("*")
+            ignoreTypeHeaders()
+        }
+        return DefaultKafkaConsumerFactory(configProps(), StringDeserializer(), deserializer)
     }
 
     @Bean
@@ -41,15 +40,14 @@ class KafkaConsumerConfig {
         return factory
     }
 
+    // Order Consumer Factory
     @Bean
     fun orderConsumerFactory(): ConsumerFactory<String, OrderEvent> {
-        val configProps: MutableMap<String, Any> = HashMap()
-        configProps[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaBootstrapServers
-        configProps[ConsumerConfig.GROUP_ID_CONFIG] = kafkaConsumerGroupId
-        configProps[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
-        configProps[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JsonDeserializer::class.java
-        configProps[JsonDeserializer.TRUSTED_PACKAGES] = "*"
-        return DefaultKafkaConsumerFactory(configProps)
+        val deserializer = JsonDeserializer(OrderEvent::class.java).apply {
+            addTrustedPackages("*")
+            ignoreTypeHeaders()
+        }
+        return DefaultKafkaConsumerFactory(configProps(), StringDeserializer(), deserializer)
     }
 
     @Bean
@@ -57,5 +55,14 @@ class KafkaConsumerConfig {
         val factory = ConcurrentKafkaListenerContainerFactory<String, OrderEvent>()
         factory.consumerFactory = orderConsumerFactory()
         return factory
+    }
+
+    // Common Kafka Consumer Configurations
+    fun configProps(): MutableMap<String, Any> {
+        val configProps: MutableMap<String, Any> = HashMap()
+        configProps[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaBootstrapServers
+        configProps[ConsumerConfig.GROUP_ID_CONFIG] = kafkaConsumerGroupId
+        configProps[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
+        return configProps
     }
 }

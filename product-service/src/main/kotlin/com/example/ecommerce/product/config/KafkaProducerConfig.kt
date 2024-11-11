@@ -1,6 +1,6 @@
 package com.example.ecommerce.product.config
 
-import com.example.ecommerce.common.dto.product.ProductEventDTO
+import com.example.ecommerce.product.dto.ProductEventDTO
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.beans.factory.annotation.Value

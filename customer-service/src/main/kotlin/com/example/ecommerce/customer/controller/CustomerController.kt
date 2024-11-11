@@ -1,6 +1,5 @@
 package com.example.ecommerce.customer.controller
 
-import com.example.ecommerce.common.dto.customer.CustomerDTO
 import com.example.ecommerce.customer.model.Customer
 import com.example.ecommerce.customer.service.CustomerService
 import io.swagger.v3.oas.annotations.Operation
@@ -11,7 +10,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/customers/api")
+@RequestMapping("/customers/api/v1")
 class CustomerController {
 
     @Autowired
@@ -21,75 +20,49 @@ class CustomerController {
     @PostMapping("/create")
     @Operation(summary = "Create a new customer")
     @ApiResponse(responseCode = "200", description = "Successful customer creation")
-    fun registerCustomer(@RequestBody customerRegistration: Customer): ResponseEntity<Customer> {
-        val newCustomer = customerService.registerCustomer(customerRegistration)
+    @ApiResponse(responseCode = "409", description = "Customer with given username already exists")
+    fun create(@RequestBody customerRegistration: Customer): ResponseEntity<Customer> {
+        val newCustomer = customerService.create(customerRegistration)
         return ResponseEntity.ok(newCustomer)
-    }
-
-    // Endpoint to customer login
-    @PostMapping("/login_customer")
-    @Operation(summary = "Customer login")
-    @ApiResponse(responseCode = "200", description = "Successful customer login")
-    fun loginCustomer(@RequestParam username: String, @RequestParam password: String): ResponseEntity<String> {
-        val jwt = customerService.loginCustomer(username, password)
-        return ResponseEntity.ok(jwt)
     }
 
     // Endpoint to find customer by id
     @GetMapping("/{customerId}")
-    @Operation(summary = "Find customer by ID")
+    @Operation(summary = "Find customer by customer id")
     @ApiResponse(responseCode = "200", description = "Successful customer retrieval")
-    fun getCustomerById(authentication: JwtAuthenticationToken,
+    @ApiResponse(responseCode = "401", description = "Not authenticated or authorized to perform this operation")
+    @ApiResponse(responseCode = "404", description = "Customer with given id doesn't exists")
+    fun findCustomer(authentication: JwtAuthenticationToken,
                     @PathVariable customerId: Long): ResponseEntity<Customer> {
-        val customer = customerService.getCustomerById(customerId)
-        if(customerService.checkCustomerAuth(authentication,customerId)) {
-            return ResponseEntity.ok(customer)
-        }else{
-            throw RuntimeException("You are not authorized to perform this operation")
-        }
-    }
-
-    @GetMapping("/{customerId}/DTO")
-    @Operation(summary = "Get customer DTO")
-    @ApiResponse(responseCode = "200", description = "Success")
-    fun getCustomerDTO(authentication: JwtAuthenticationToken,
-                    @PathVariable customerId: Long): ResponseEntity<CustomerDTO> {
-        if(customerService.checkCustomerAuth(authentication,customerId)) {
-            val customerDTO = customerService.getCustomerDTO(customerId)
-            return ResponseEntity.ok(customerDTO)
-        }else{
-            throw RuntimeException("You are not authorized to perform this operation")
-        }
+        val customer = customerService.findCustomer(authentication, customerId)
+        return ResponseEntity.ok(customer)
     }
 
     // Endpoint to update customer
     @PutMapping("/{customerId}")
     @Operation(summary = "Update customer")
     @ApiResponse(responseCode = "200", description = "Successful customer update")
-    fun updateUser(authentication: JwtAuthenticationToken,
+    @ApiResponse(responseCode = "401", description = "Not authenticated or authorized to perform this operation")
+    @ApiResponse(responseCode = "404", description = "Customer with given id doesn't exists")
+    @ApiResponse(responseCode = "409", description = "Username already used")
+    fun update(authentication: JwtAuthenticationToken,
         @PathVariable customerId: Long,
         @RequestBody updatedCustomer: Customer,
     ): ResponseEntity<Customer> {
-        if(customerService.checkCustomerAuth(authentication,customerId)) {
-            val customer = customerService.updateCustomer(updatedCustomer)
+            val customer = customerService.update(authentication, customerId, updatedCustomer)
             return ResponseEntity.ok(customer)
-        }else{
-            throw RuntimeException("You are not authorized to perform this operation")
-        }
     }
 
     // Endpoint to delete user
     @Operation(summary = "Delete customer")
     @ApiResponse(responseCode = "200", description = "Successful customer deletion")
+    @ApiResponse(responseCode = "401", description = "Not authenticated or authorized to perform this operation")
     @DeleteMapping("/{customerId}")
-    fun deleteUser(authentication: JwtAuthenticationToken, @PathVariable customerId: Long): ResponseEntity<Void> {
-        if(customerService.checkCustomerAuth(authentication,customerId)) {
-            customerService.deleteCustomer(customerId)
+    fun delete(authentication: JwtAuthenticationToken, @PathVariable customerId: Long): ResponseEntity<Void> {
+            customerService.delete(authentication, customerId)
             return ResponseEntity.ok(null)
-        }else{
-            throw RuntimeException("You are not authorized to perform this operation")
-        }
     }
 }
+
 
 
