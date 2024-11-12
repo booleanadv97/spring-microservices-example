@@ -1,19 +1,31 @@
 # Soluzioni Avanzate per lo Sviluppo e la Sicurezza di Microservizi
 
-Progetto di esempio di un sistema eCommerce realizzato con architettura a microservizi, sviluppato per dimostrare tecniche avanzate di sviluppo e sicurezza.
-
 ## Indice
 
-- [Introduzione](#introduzione)
+- [Abstract](#abstract)
+- [Obiettivi del Progetto](#obiettivi-del-progetto)
+- [Contesto e Background](#contesto-e-background)
+- [Metodologia](#metodologia)
 - [Struttura del Progetto](#struttura-del-progetto)
 - [Tecnologie Utilizzate](#tecnologie-utilizzate)
 - [Requisiti](#requisiti)
 - [Installazione e Configurazione](#installazione-e-configurazione)
 - [Documentazione delle API](#documentazione-delle-api)
+- [Risultati](#risultati)
+- [Limitazioni e Sviluppi Futuri](#limitazioni-e-sviluppi-futuri)
+## Abstract
+Questo progetto fa parte della tesi intitolata "Soluzioni Avanzate per lo Sviluppo e la Sicurezza di Microservizi", in cui si analizzano tecniche di scalabilità e sicurezza per un’architettura a microservizi applicata a un sistema di eCommerce. Lo scopo è dimostrare come l’adozione di pratiche avanzate possa migliorare la resilienza, la sicurezza e l’efficienza di sistemi distribuiti.
 
-## Introduzione
+## Obiettivi del Progetto
+- Dimostrare i vantaggi dei microservizi in termini di scalabilità e modularità.
+- Implementare un sistema di autenticazione centralizzato con Keycloak.
+- Garantire la comunicazione sicura e asincrona tra i servizi tramite Apache Kafka.
 
-Questo progetto implementa un esempio di sistema eCommerce utilizzando un'architettura a microservizi. Ogni componente è sviluppato per funzionare in modo autonomo e scalabile, facilitando la gestione, il mantenimento e l’espansione del sistema.
+## Contesto e Background
+I microservizi rappresentano un’evoluzione rispetto ai sistemi monolitici, offrendo modularità e indipendenza tra i componenti. In questo progetto, si è scelto di utilizzare Spring Cloud per facilitare la comunicazione e la gestione dei microservizi.
+
+## Metodologia
+Il progetto è stato sviluppato seguendo un approccio modulare. Dopo un’analisi delle esigenze e delle tecnologie disponibili, i vari microservizi sono stati progettati e integrati tramite Docker e Docker Compose per garantire la portabilità.
 
 ## Struttura del Progetto
 
@@ -70,3 +82,10 @@ Accedi alla documentazione Swagger per ogni microservizio all’indirizzo:
 
    ```bash
    http://<host>:<port>/<nome microservizio>/swagger-ui/index.html
+
+## Risultati
+Il progetto ha dimostrato che l’utilizzo di un’architettura a microservizi migliora la modularità e la scalabilità del sistema di eCommerce. L'integrazione di Keycloak ha permesso un'autenticazione centralizzata e sicura, mentre l'uso di Kafka ha facilitato la comunicazione asincrona tra i servizi.
+
+## Limitazioni e Sviluppi Futuri
+Il progetto è stato testato su un ambiente di sviluppo limitato. Per applicazioni in produzione, ulteriori ottimizzazioni di sicurezza e performance sono raccomandate. Sviluppi futuri potrebbero includere l'adozione di tecniche di monitoraggio e il miglioramento della resilienza tramite circuit breakers.
+
