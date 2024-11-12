@@ -57,7 +57,7 @@ Assicurati di avere installato:
    cd spring-microservices-example
 
 2. **Configura i Servizi**
-Modifica il file di configurazione docker-compose.yml per le connessioni al database e ad altri servizi, come Eureka e Kafka.
+Modifica il file di configurazione **docker-compose.yml** per le connessioni al database e ad altri servizi, come Eureka e Kafka.
 
 3. **Avvia i Container Docker**
 Utilizza Docker Compose per avviare i container dei vari servizi:
