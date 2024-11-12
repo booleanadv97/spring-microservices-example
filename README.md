@@ -78,10 +78,7 @@ Utilizza Docker Compose per avviare i container dei vari servizi:
 
 ## Documentazione delle API
 Le API di ciascun microservizio sono documentate tramite Swagger:
-Accedi alla documentazione Swagger per ogni microservizio all’indirizzo:
-
-   ```bash
-   http://<host>:<port>/<nome microservizio>/swagger-ui/index.html
+Accedi alla documentazione Swagger per ogni microservizio: `http://<host>:<port>/<nome microservizio>/swagger-ui/index.html`.
 
 ## Risultati
 Il progetto ha dimostrato che l’utilizzo di un’architettura a microservizi migliora la modularità e la scalabilità del sistema di eCommerce. L'integrazione di Keycloak ha permesso un'autenticazione centralizzata e sicura, mentre l'uso di Kafka ha facilitato la comunicazione asincrona tra i servizi.
