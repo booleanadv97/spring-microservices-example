@@ -1,4 +1,4 @@
-# Soluzioni Avanzate per lo Sviluppo e la Sicurezza di Microservizi
+# Soluzioni Avanzate per la Progettazione Sicura e lo Sviluppo Efficiente di Microservizi
 
 ## Indice
 
@@ -14,7 +14,7 @@
 - [Risultati](#risultati)
 - [Limitazioni e Sviluppi Futuri](#limitazioni-e-sviluppi-futuri)
 ## Abstract
-Questo progetto fa parte della tesi intitolata "Soluzioni Avanzate per lo Sviluppo e la Sicurezza di Microservizi", in cui si analizzano tecniche di scalabilità e sicurezza per un’architettura a microservizi applicata a un sistema di eCommerce. Lo scopo è dimostrare come l’adozione di pratiche avanzate possa migliorare la resilienza, la sicurezza e l’efficienza di sistemi distribuiti.
+Questo progetto fa parte della tesi intitolata "Soluzioni Avanzate per la Progettazione Sicura e lo Sviluppo Efficiente di Microservizi", in cui si analizzano tecniche di scalabilità e sicurezza per un’architettura a microservizi applicata a un sistema di eCommerce. Lo scopo è dimostrare come l’adozione di pratiche avanzate possa migliorare la resilienza, la sicurezza e l’efficienza di sistemi distribuiti.
 
 ## Obiettivi del Progetto
 - Dimostrare i vantaggi dei microservizi in termini di scalabilità e modularità.
